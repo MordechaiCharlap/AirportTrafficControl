@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 
 namespace AirportTrafficControlTower.Service.Dtos
 {
-    public class StationDto
+    public class GetStationDto
     {
-        public int StationId { get; set; }
+        public int StationNumber { get; set; }
         public int? OccupiedBy { get; set; }
     }
 }

@@ -11,9 +11,9 @@ namespace AirportTrafficControlTower.Service.Interfaces
     public interface IBusinessService
     {
         Task<IEnumerable<int>> GetNextStations();
-        Task<IEnumerable<FlightDto>> GetFinishedRoutesHistory();
-        Task<IEnumerable<StationDto>> GetAllStationsStatus();
-        Task<IEnumerable<FlightDto>> GetAllFlights();
-        Task AddNewFlight(FlightDto flight);
+        Task<IEnumerable<GetFlightDto>> GetFinishedRoutesHistory();
+        Task<IEnumerable<GetStationDto>> GetAllStationsStatus();
+        Task<IEnumerable<GetFlightDto>> GetAllFlights();
+        Task AddNewFlight(CreateFlightDto flight);
     }
 }

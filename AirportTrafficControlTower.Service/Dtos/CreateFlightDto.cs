@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace AirportTrafficControlTower.Service.Dtos
 {
-    public class FlightDto
+    public class CreateFlightDto
     {
-        public int FlightId { get; set; }
         public bool IsAscending { get; set; }
-
     }
 }

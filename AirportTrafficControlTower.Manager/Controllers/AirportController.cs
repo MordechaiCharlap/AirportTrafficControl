@@ -18,7 +18,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
         }
         [Route("[action]", Name = "GetAllFlights")]
         [HttpGet]
-        public async Task<IEnumerable<FlightDto>> GetAllFlights()
+        public async Task<IEnumerable<GetFlightDto>> GetAllFlights()
         {
             //###################################################
             //return null;
@@ -26,16 +26,15 @@ namespace AirportTrafficControlTower.Manager.Controllers
         }
         [Route("[action]", Name = "GetAllStationsStatus")]
         [HttpGet]
-        public async Task<IEnumerable<StationDto>> GetAllStationsStatus()
+        public async Task<IEnumerable<GetStationDto>> GetAllStationsStatus()
         {
             return await _businessService.GetAllStationsStatus();
         }
         [Route("[action]", Name = "AddNewFlight")]
-        [HttpPost(Name = "AddNewFlight")]
-        public async Task AddNewFlight(FlightDto flight)
+        [HttpPost]
+        public async Task AddNewFlight(CreateFlightDto flight)
         {
             await _businessService.AddNewFlight(flight);
         }
-        
     }
 }

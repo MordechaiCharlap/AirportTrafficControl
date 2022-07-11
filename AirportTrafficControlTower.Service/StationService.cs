@@ -19,16 +19,14 @@ namespace AirportTrafficControlTower.Service
         {
             _stationRepository = stationRepository;
         }
-        public async Task<IEnumerable<StationDto>> GetAll()
+
+        public Task Create(Station entity)
         {
-            List<StationDto> listDtos = new();
-            var stationsList = await _stationRepository.GetAll().ToListAsync();
-            _stationRepository.GetAll().ToList().ForEach(station =>
-            {
-                StationDto stationDto = new() { StationId = station.StationId, OccupiedBy = station.OccupiedBy };
-                listDtos.Add(stationDto);
-            });
-            return listDtos;
+            throw new NotImplementedException();
+        }
+        public async Task<List<Station>> GetAll()
+        {
+            return await _stationRepository.GetAll().ToListAsync();
         }
     }
 }

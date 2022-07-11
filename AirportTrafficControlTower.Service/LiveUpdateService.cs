@@ -1,4 +1,7 @@
-﻿using AirportTrafficControlTower.Service.Interfaces;
+﻿using AirportTrafficControlTower.Data.Model;
+using AirportTrafficControlTower.Data.Repositories.Interfaces;
+using AirportTrafficControlTower.Service.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,7 +10,22 @@ using System.Threading.Tasks;
 
 namespace AirportTrafficControlTower.Service
 {
-    internal class LiveUpdateService:ILiveUpdateService
+    public class LiveUpdateService : ILiveUpdateService
     {
+        private readonly IRepository<LiveUpdate> _liveUpdateRepository;
+        public LiveUpdateService(IRepository<LiveUpdate> liveUpdateRepository)
+        {
+            _liveUpdateRepository = liveUpdateRepository;
+        }
+        public async Task Create(LiveUpdate entity)
+        {
+            _liveUpdateRepository.Create(entity);
+            await _liveUpdateRepository.SaveChangesAsync();
+        }
+
+        public async Task<IEnumerable<LiveUpdate>> GetAll()
+        {
+            return await _liveUpdateRepository.GetAll().ToListAsync();
+        }
     }
 }

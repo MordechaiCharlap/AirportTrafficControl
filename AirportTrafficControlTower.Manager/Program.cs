@@ -21,6 +21,8 @@ builder.Services.AddSwaggerGen();
 builder.Services.AddScoped<IBusinessService, BusinessService>();
 builder.Services.AddScoped<IFlightService, FlightService>();
 builder.Services.AddScoped<IStationService, StationService>();
+builder.Services.AddScoped<ILiveUpdateService, LiveUpdateService>();
+builder.Services.AddScoped<IRouteService, RouteService>();
 IServiceCollection serviceCollection = builder.Services.AddScoped<IRepository<Flight>, FlightRepository>();
 builder.Services.AddScoped<IRepository<LiveUpdate>, LiveUpdateRepositry>();
 builder.Services.AddScoped<IRepository<Station>, StationRepository>();

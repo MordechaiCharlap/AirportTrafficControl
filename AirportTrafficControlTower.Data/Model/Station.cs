@@ -12,10 +12,13 @@ namespace AirportTrafficControlTower.Data.Model
         public Station()
         {
             LiveUpdates = new HashSet<LiveUpdate>();
+            RouteDestinations = new HashSet<Route>();
+            RouteSources = new HashSet<Route>();
         }
 
-        [Key]
         public int StationId { get; set; }
+        [Key]
+        public int StationNumber { get; set; }
         public int? OccupiedBy { get; set; }
 
         [ForeignKey("OccupiedBy")]
@@ -23,5 +26,9 @@ namespace AirportTrafficControlTower.Data.Model
         public virtual Flight? OccupiedByNavigation { get; set; }
         [InverseProperty("Station")]
         public virtual ICollection<LiveUpdate> LiveUpdates { get; set; }
+        [InverseProperty("RouteDestinations")]
+        public virtual ICollection<Route> RouteDestinations { get; set; }
+        [InverseProperty("RouteSources")]
+        public virtual ICollection<Route> RouteSources { get; set; }
     }
 }

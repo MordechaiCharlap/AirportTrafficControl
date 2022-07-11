@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
 namespace AirportTrafficControlTower.Service
 {
@@ -17,27 +18,24 @@ namespace AirportTrafficControlTower.Service
         {
             _flightRepostory = flightRepository;
         }
-        public async Task AddNewFlight(FlightDto flightDto)
+        
+        public async Task Create(Flight flight)
         {
-            Flight flight = new Flight()
-            {
-                IsAscending = flightDto.IsAscending,
-                IsPending = true,
-                IsDone = false
-            };
+            flight.IsPending = true;
+            flight.IsDone = false;
+            flight.SubmissionTime = DateTime.Now;
             _flightRepostory.Create(flight);
             await _flightRepostory.SaveChangesAsync();
         }
 
-        public IEnumerable<FlightDto> GetAll()
+        public async Task<Flight?> Get(int id)
         {
-            List<FlightDto> flights = new();
+            return await _flightRepostory.GetById(id);
+        }
 
-            _flightRepostory.GetAll().ToList().ForEach(flight =>
-            {
-                flights.Add(new FlightDto() { FlightId = flight.FlightId, IsAscending = flight.IsAscending });
-            });
-            return flights;
+        public async Task<List<Flight>> GetAll()
+        {
+            return await _flightRepostory.GetAll().ToListAsync();
         }
     }
 }

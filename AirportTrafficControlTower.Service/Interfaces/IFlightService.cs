@@ -4,9 +4,8 @@ using System;
 
 namespace AirportTrafficControlTower.Service.Interfaces
 {
-    public interface IFlightService
+    public interface IFlightService:IService<Flight>
     {
-        Task AddNewFlight(FlightDto flightDto);
-        IEnumerable<FlightDto> GetAll();
+        Task<List<Flight>> GetPendingFlightsByIsAscending(bool isAscending);
     }
 }
