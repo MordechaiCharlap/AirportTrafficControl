@@ -5,7 +5,7 @@ using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using AirportTrafficControlTower.Data.Contexts;
 using AutoMapper;
-using Microsoft.AspNetCore.Components;
+using System.Windows.Threading;
 
 namespace AirportTrafficControlTower.Service
 {
@@ -17,7 +17,7 @@ namespace AirportTrafficControlTower.Service
         private readonly IRouteService _routeService;
         private readonly AirPortTrafficControlContext _context;
         private readonly IMapper _mapper;
-        private readonly Dispatcher dispatcher;
+        private readonly DispatcherTimer dispatcher;
 
         public BusinessService(IFlightService flightService, IStationService stationService, 
             ILiveUpdateService liveUpdateService, AirPortTrafficControlContext context, IMapper mapper, IRouteService routeService)
@@ -96,56 +96,42 @@ namespace AirportTrafficControlTower.Service
             });
             if (success)
             {
-                LiveUpdate update = new() { FlightId = flight.FlightId, IsEntering = false, StationId = (int)stationNumber!, UpdateTime=DateTime.Now};
-                await _liveUpdateService.Create(update);
+                if (flight.IsPending)
+                {
+                    flight.IsPending = false;
+                }
+                else
+                {
+                    LiveUpdate leavingUpdate = new() { FlightId = flight.FlightId, IsEntering = false, StationId = (int)stationNumber!, UpdateTime = DateTime.Now };
+                    await _liveUpdateService.Create(leavingUpdate);
+                    Console.WriteLine("Flight left station x");
+                }
+                if (!flight.IsDone)
+                {
+                    LiveUpdate enteringUpdate = new() { FlightId = flight.FlightId, IsEntering = true, StationId = (int)stationNumber!, UpdateTime = DateTime.Now };
+                    await _liveUpdateService.Create(enteringUpdate);
+                    Console.WriteLine("Flight enters station y");
+                }
+                else
+                {
+                    Console.WriteLine("Flight finished the route");
+                }
                 if (currentStation != null)
                 {
-                    currentStation.OccupiedBy = null;
+                    currentStation!.OccupiedBy = null;
                     OccupyStationIfPossible(currentStation);
                 }
-                    
-                if(flight.IsPending) 
-                    flight.IsPending = false;
                 await _context.SaveChangesAsync();
-
             }
 
         }
         private async void OccupyStationIfPossible(Station currentStation)
         {
-            Flight? selectedFlight = null;
-            bool success;
             //Find all the stations that point to the current empty station.
             var pointingStations = _routeService.GetPointingStations(currentStation);
-
-            foreach (var pointingStation in pointingStations)
-            {
-                var flightId = pointingStation.OccupiedBy;
-                if (flightId!=null)
-                {
-                    Flight flightToCheck = await _flightService.Get((int)flightId);
-                    if (selectedFlight == null) selectedFlight = flightToCheck;
-                    else
-                    {
-                        if (selectedFlight.SubmissionTime >= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
-                    }
-                }
-            }
-            //returns if its a first station in an ascendingRoute(true), descendingRoute(false) or neither(null)
             bool? isFirstAscendingStation = _routeService.IsFirstAscendingStation(currentStation);
-            if (isFirstAscendingStation != null)
-            {
-                bool isAsc = (bool)isFirstAscendingStation;
-                var pendingList = await _flightService.GetPendingFlightsByIsAscending(isAsc);
-                if (pendingList.Count!=0)
-                {
-                    if (selectedFlight == null) selectedFlight = pendingList[0];
-                    else
-                    {
-                        if (selectedFlight.SubmissionTime >= pendingList[0].SubmissionTime) selectedFlight = pendingList[0];
-                    }
-                }
-            }
+            bool isAsc = (bool)isFirstAscendingStation;
+            var selectedFlight = await _flightService.GetFirstFlightInQueue(pointingStations, isAsc);
             if (selectedFlight != null) MoveNextIfPossible(selectedFlight);
 
 
