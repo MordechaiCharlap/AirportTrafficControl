@@ -23,9 +23,19 @@ namespace AirportTrafficControlTower.Service
             await _liveUpdateRepository.SaveChangesAsync();
         }
 
-        public async Task<IEnumerable<LiveUpdate>> GetAll()
+        public async Task<LiveUpdate?> Get(int id)
+        {
+            return await _liveUpdateRepository.GetById(id);
+        }
+
+        public async Task<List<LiveUpdate>> GetAll()
         {
             return await _liveUpdateRepository.GetAll().ToListAsync();
+        }
+
+        public Task<bool> Update(LiveUpdate entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -26,9 +26,10 @@ namespace AirportTrafficControlTower.Data.Model
         public virtual Flight? OccupiedByNavigation { get; set; }
         [InverseProperty("Station")]
         public virtual ICollection<LiveUpdate> LiveUpdates { get; set; }
-        [InverseProperty("RouteDestinations")]
-        public virtual ICollection<Route> RouteDestinations { get; set; }
-        [InverseProperty("RouteSources")]
+        [InverseProperty("SourceStation")]
         public virtual ICollection<Route> RouteSources { get; set; }
+        [InverseProperty("DestinationStation")]
+        public virtual ICollection<Route> RouteDestinations { get; set; }
+        
     }
 }

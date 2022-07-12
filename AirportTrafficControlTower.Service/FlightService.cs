@@ -61,7 +61,7 @@ namespace AirportTrafficControlTower.Service
             if (isFirstAscendingStation != null)
             {
 
-                var pendingFirstFlight = await GetFirstPendingByAsc((bool)isFirstAscendingStation);
+                var pendingFirstFlight = _flightRepostory.GetAll().FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation&&flight.IsPending==true);
                 if (pendingFirstFlight!=null)
                 {
                     if (selectedFlight == null) selectedFlight = pendingFirstFlight;
@@ -74,7 +74,7 @@ namespace AirportTrafficControlTower.Service
             return selectedFlight;
         }
 
-        private Task<Flight?> GetFirstPendingByAsc(bool isAscending)
+        public Task<bool> Update(Flight entity)
         {
             throw new NotImplementedException();
         }

@@ -15,11 +15,12 @@ namespace AirportTrafficControlTower.Data.Model
         public bool IsAscending { get; set; }
         public int? Destination { get; set; }
 
-        [ForeignKey("Destination")]
-        [InverseProperty("RouteDestinations")]
-        public virtual Station? DestinationStation { get; set; }
+        
         [ForeignKey("Source")]
         [InverseProperty("RouteSources")]
         public virtual Station? SourceStation { get; set; }
+        [ForeignKey("Destination")]
+        [InverseProperty("RouteDestinations")]
+        public virtual Station? DestinationStation { get; set; }
     }
 }

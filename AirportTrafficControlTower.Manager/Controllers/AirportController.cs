@@ -11,11 +11,23 @@ namespace AirportTrafficControlTower.Manager.Controllers
     public class AirportController : ControllerBase
     {
         private readonly IBusinessService _businessService;
-
+        private bool _isWorking = false;
         public AirportController(IBusinessService businessService)
         {
             _businessService = businessService;
         }
+        [Route("[action]", Name = "StartApp")]
+        [HttpPost]
+        public async Task StartApp()
+        {
+            if (!_isWorking)
+            {
+                _isWorking = true;
+                await _businessService.StartApp();
+            }
+               
+        }
+       
         [Route("[action]", Name = "GetAllFlights")]
         [HttpGet]
         public async Task<IEnumerable<GetFlightDto>> GetAllFlights()

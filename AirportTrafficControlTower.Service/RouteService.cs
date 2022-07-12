@@ -46,11 +46,25 @@ namespace AirportTrafficControlTower.Service
             return pointingStations;
         }
 
+        public async Task<List<Route>> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
+        {
+            return await _routeRepository.GetAll().
+                Include(route => route.DestinationStation).
+                Where(route => route.Source == currentStationNumber &&
+                      route.IsAscending == isAscending &&
+                      (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null)).ToListAsync();
+        }
+
         public bool? IsFirstAscendingStation(Station currentStation)
         {
             var waitingRoute = _routeRepository.GetAll().
                 FirstOrDefault(route => route.Destination == currentStation.StationNumber && route.Source == null);
             return waitingRoute == null ? null : waitingRoute.IsAscending;
+        }
+
+        public Task<bool> Update(Route entity)
+        {
+            throw new NotImplementedException();
         }
     }
 }

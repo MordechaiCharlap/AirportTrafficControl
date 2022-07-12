@@ -11,5 +11,6 @@ namespace AirportTrafficControlTower.Service.Interfaces
         Task Create(T entity);
         Task<List<T>> GetAll();
         Task<T?> Get(int id);
+        Task<bool> Update (T entity);
     }
 }

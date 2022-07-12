@@ -50,17 +50,16 @@ namespace AirportTrafficControlTower.Data.Contexts
 
             modelBuilder.Entity<Route>(entity =>
             {
-                entity.Property(e => e.RouteId).ValueGeneratedNever();
+                entity.HasOne(d => d.SourceStation)
+                    .WithMany(p => p.RouteSources)
+                    .HasForeignKey(d => d.Source)
+                    .HasConstraintName("FK__Route__Source__160F4887");
 
-                entity.HasOne(d => d.DestinationNavigation)
-                    .WithMany(p => p.RouteDestinationNavigations)
+                entity.HasOne(d => d.DestinationStation)
+                    .WithMany(p => p.RouteDestinations)
                     .HasForeignKey(d => d.Destination)
                     .HasConstraintName("FK__Route__Destinati__17036CC0");
 
-                entity.HasOne(d => d.SourceNavigation)
-                    .WithMany(p => p.RouteSourceNavigations)
-                    .HasForeignKey(d => d.Source)
-                    .HasConstraintName("FK__Route__Source__160F4887");
             });
 
             modelBuilder.Entity<Station>(entity =>

@@ -1,6 +1,7 @@
 ﻿using AirportTrafficControlTower.Data.Contexts;
 using AirportTrafficControlTower.Data.Model;
 using AirportTrafficControlTower.Data.Repositories.Interfaces;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -49,11 +50,11 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public async Task<bool> Update(Station entity)
         {
-            var station = await GetById(entity.StationId);
+            var station = await GetById(entity.StationNumber);
             if (station == null) return false;
             else
             {
-                _context.Update(station);
+                _context.Stations.Update(station);
                 return true;
             }
         }

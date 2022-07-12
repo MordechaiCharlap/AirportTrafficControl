@@ -8,7 +8,9 @@ using System.Threading.Tasks;
 
 namespace AirportTrafficControlTower.Service.Interfaces
 {
-    public interface IStationService:IService<Station>
+    public interface IStationService : IService<Station>
     {
+        Task<Station?> GetStationByFlightId(int flightId);
+        Task ChangeOccupyBy(int stationNumber ,int? flightId);
     }
 }

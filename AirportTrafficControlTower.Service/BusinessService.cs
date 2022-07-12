@@ -5,7 +5,6 @@ using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using AirportTrafficControlTower.Data.Contexts;
 using AutoMapper;
-using System.Windows.Threading;
 
 namespace AirportTrafficControlTower.Service
 {
@@ -15,26 +14,37 @@ namespace AirportTrafficControlTower.Service
         private readonly IStationService _stationService;
         private readonly ILiveUpdateService _liveUpdateService;
         private readonly IRouteService _routeService;
-        private readonly AirPortTrafficControlContext _context;
         private readonly IMapper _mapper;
-        private readonly DispatcherTimer dispatcher;
 
-        public BusinessService(IFlightService flightService, IStationService stationService, 
+        public BusinessService(IFlightService flightService, IStationService stationService,
             ILiveUpdateService liveUpdateService, AirPortTrafficControlContext context, IMapper mapper, IRouteService routeService)
         {
             _flightService = flightService;
             _stationService = stationService;
             _liveUpdateService = liveUpdateService;
             _routeService = routeService;
-            _context = context;
             _mapper = mapper;
         }
+        public async Task StartApp()
+        {
+            List<Station> allStations = await _stationService.GetAll();
+            Parallel.ForEach(allStations, async station =>
+            {
+                if (station.OccupiedBy != null)
+                {
+                    var flight = await _flightService.Get((int)station.OccupiedBy);
 
+                    await StartTime(flight!);
+                }
+            });
+
+
+        }
         public async Task AddNewFlight(CreateFlightDto flightDto)
         {
             var newFlight = _mapper.Map<Flight>(flightDto);
             await _flightService.Create(newFlight);
-            MoveNextIfPossible(newFlight);
+            await MoveNextIfPossible(newFlight);
             Console.WriteLine($"asc = {newFlight.IsAscending} pend = {newFlight.IsPending} flightId = {newFlight.FlightId}");
         }
 
@@ -63,22 +73,15 @@ namespace AirportTrafficControlTower.Service
             throw new NotImplementedException();
         }
 
-        public async Task<IEnumerable<int>> GetNextStations()
+        private async Task MoveNextIfPossible(Flight flight)
         {
-            throw new NotImplementedException();
-        }
-        private async void MoveNextIfPossible(Flight flight)
-        {
-            var currentStation = _context.Stations.
-                FirstOrDefault(station => station.OccupiedBy == flight.FlightId);
-            int? stationNumber = currentStation != null ? currentStation.StationNumber : null;
-            var nextRoutes = _context.Routes.
-                Include(route => route.DestinationStation).
-                Where(route => route.Source == stationNumber &&
-                      route.IsAscending == flight.IsAscending &&
-                      (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null)).ToList();
+            Console.WriteLine($"Flight {flight.FlightId} is trying to move next");
+            Station? nextStation = null;
+            var currentStation = await _stationService.GetStationByFlightId(flight.FlightId);
+            int? currentStationNumber = currentStation != null ? currentStation.StationNumber : null;
+            var nextRoutes = await _routeService.GetRoutesByCurrentStationAndAsc(currentStationNumber, flight.IsAscending);
             var success = false;
-            nextRoutes.ForEach(route =>
+            foreach (var route in nextRoutes)
             {
                 if (!success)
                 {
@@ -90,53 +93,70 @@ namespace AirportTrafficControlTower.Service
                     else if (route.DestinationStation.OccupiedBy == null)
                     {
                         success = true;
-
+                        nextStation = await _stationService.Get((int)route.Destination!);
+                        await _stationService.ChangeOccupyBy(nextStation!.StationNumber, flight.FlightId);
+                        Console.WriteLine($"Station {nextStation.StationNumber} occupation updated");
                     }
                 }
-            });
+            }
             if (success)
             {
+                Console.WriteLine($"Flight {flight.FlightId} succeed");
+
                 if (flight.IsPending)
                 {
                     flight.IsPending = false;
+                    Console.WriteLine($"Flight {flight.FlightId} started the route");
                 }
                 else
                 {
-                    LiveUpdate leavingUpdate = new() { FlightId = flight.FlightId, IsEntering = false, StationId = (int)stationNumber!, UpdateTime = DateTime.Now };
+
+                    LiveUpdate leavingUpdate = new() { FlightId = flight.FlightId, IsEntering = false, StationId = currentStation!.StationNumber, UpdateTime = DateTime.Now };
                     await _liveUpdateService.Create(leavingUpdate);
-                    Console.WriteLine("Flight left station x");
+                    Console.WriteLine($"Flight {flight.FlightId} left station {currentStation!.StationNumber}");
                 }
                 if (!flight.IsDone)
                 {
-                    LiveUpdate enteringUpdate = new() { FlightId = flight.FlightId, IsEntering = true, StationId = (int)stationNumber!, UpdateTime = DateTime.Now };
+                    LiveUpdate enteringUpdate = new() { FlightId = flight.FlightId, IsEntering = true, StationId = nextStation!.StationNumber, UpdateTime = DateTime.Now };
                     await _liveUpdateService.Create(enteringUpdate);
-                    Console.WriteLine("Flight enters station y");
+                    Console.WriteLine($"Flight {flight.FlightId} enters station {nextStation!.StationNumber}, station {nextStation.StationNumber} is occupied by {nextStation.OccupiedBy}");
+                    Task timerTask = Task.Run(async() => await StartTime(flight));
                 }
                 else
                 {
-                    Console.WriteLine("Flight finished the route");
+                    flight.TimerFinished = null;
+                    Console.WriteLine($"Flight {flight.FlightId} finished the route");
                 }
                 if (currentStation != null)
                 {
-                    currentStation!.OccupiedBy = null;
-                    OccupyStationIfPossible(currentStation);
+                    await _stationService.ChangeOccupyBy(currentStation.StationNumber, null);
+                    await SendWaitingInLineFlightIfPossible(currentStation);
                 }
-                await _context.SaveChangesAsync();
+                Console.WriteLine("Saved changes");
+
             }
+            else
+                Console.WriteLine($"Flight {flight.FlightId} hasnt managed to move next");
 
         }
-        private async void OccupyStationIfPossible(Station currentStation)
+        private async Task SendWaitingInLineFlightIfPossible(Station currentStation)
         {
             //Find all the stations that point to the current empty station.
             var pointingStations = _routeService.GetPointingStations(currentStation);
             bool? isFirstAscendingStation = _routeService.IsFirstAscendingStation(currentStation);
-            bool isAsc = (bool)isFirstAscendingStation;
-            var selectedFlight = await _flightService.GetFirstFlightInQueue(pointingStations, isAsc);
-            if (selectedFlight != null) MoveNextIfPossible(selectedFlight);
-
+            var selectedFlight = await _flightService.GetFirstFlightInQueue(pointingStations, (bool)isFirstAscendingStation!);
+            if (selectedFlight != null) await MoveNextIfPossible(selectedFlight);
 
         }
-        private async void StartTimer(Flight flight) {
+        private async Task StartTime(Flight flight)
+        {
+            flight.TimerFinished = false;
+            Console.WriteLine($"{flight.FlightId} timer started");
+            var rand = new Random();
+            await Task.Delay(rand.Next(3000, 10000));
+            Console.WriteLine($"{flight.FlightId} timer finished");
+            flight.TimerFinished = true;
+            await MoveNextIfPossible(flight);
         }
     }
 }
