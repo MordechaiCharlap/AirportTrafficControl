@@ -23,7 +23,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
             if (!_isWorking)
             {
                 _isWorking = true;
-                await _businessService.StartApp();
+                _businessService.StartApp();
             }
                
         }

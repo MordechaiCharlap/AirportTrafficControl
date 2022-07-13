@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace AirportTrafficControlTower.Service
 {
-    public class RouteService:IRouteService
+    public class RouteService : IRouteService
     {
         private readonly IRepository<Route> _routeRepository;
         public RouteService(IRepository<Route> routeRepository)
@@ -48,11 +48,20 @@ namespace AirportTrafficControlTower.Service
 
         public async Task<List<Route>> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
         {
-            return await _routeRepository.GetAll().
+            var list = await _routeRepository.GetAll().Include(route => route.DestinationStation).ToListAsync();
+            list.ForEach(route =>
+            {
+                if (route.DestinationStation != null)
+                    Console.WriteLine(route.DestinationStation.StationNumber);
+            });
+            if (list[list.Count - 1].DestinationStation.OccupiedBy==null&& list[list.Count - 1].IsAscending==isAscending)
+                Console.WriteLine("True");
+            var list2 = await _routeRepository.GetAll().
                 Include(route => route.DestinationStation).
                 Where(route => route.Source == currentStationNumber &&
                       route.IsAscending == isAscending &&
                       (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null)).ToListAsync();
+            return list2;
         }
 
         public bool? IsFirstAscendingStation(Station currentStation)

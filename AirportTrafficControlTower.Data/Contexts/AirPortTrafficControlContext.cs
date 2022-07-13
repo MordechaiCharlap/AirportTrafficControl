@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
+using AirportTrafficControlTower.Data;
 using AirportTrafficControlTower.Data.Model;
 
 namespace AirportTrafficControlTower.Data.Contexts
@@ -39,42 +40,40 @@ namespace AirportTrafficControlTower.Data.Contexts
                     .WithMany(p => p.LiveUpdates)
                     .HasForeignKey(d => d.FlightId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__LiveUpdat__Fligh__0F624AF8");
+                    .HasConstraintName("FK__LiveUpdat__Fligh__2CF2ADDF");
 
                 entity.HasOne(d => d.Station)
                     .WithMany(p => p.LiveUpdates)
                     .HasForeignKey(d => d.StationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK__LiveUpdat__Stati__10566F31");
+                    .HasConstraintName("FK__LiveUpdat__Stati__2DE6D218");
             });
 
             modelBuilder.Entity<Route>(entity =>
             {
                 entity.HasOne(d => d.SourceStation)
-                    .WithMany(p => p.RouteSources)
-                    .HasForeignKey(d => d.Source)
-                    .HasConstraintName("FK__Route__Source__160F4887");
+                   .WithMany(p => p.RouteSources)
+                 .HasForeignKey(d => d.Source)
+                    .HasConstraintName("FK__Route__Source__31B762FC");
 
                 entity.HasOne(d => d.DestinationStation)
-                    .WithMany(p => p.RouteDestinations)
-                    .HasForeignKey(d => d.Destination)
-                    .HasConstraintName("FK__Route__Destinati__17036CC0");
-
+                 .WithMany(p => p.RouteDestinations)
+                
+                   .HasForeignKey(d => d.Destination)
+                    .HasConstraintName("FK__Route__Destinati__30C33EC3");
             });
 
             modelBuilder.Entity<Station>(entity =>
             {
                 entity.HasKey(e => e.StationNumber)
-                    .HasName("PK__Station__E0D8A6BD60F59A79");
+                    .HasName("PK__Station__26EDF8CC23B62B71");
 
                 entity.Property(e => e.StationNumber).ValueGeneratedNever();
-
-                entity.Property(e => e.StationId).ValueGeneratedOnAdd();
 
                 entity.HasOne(d => d.OccupiedByNavigation)
                     .WithMany(p => p.Stations)
                     .HasForeignKey(d => d.OccupiedBy)
-                    .HasConstraintName("FK__Station__Occupie__7B5B524B");
+                    .HasConstraintName("FK__Station__Occupie__2A164134");
             });
 
             OnModelCreatingPartial(modelBuilder);

@@ -14,6 +14,6 @@ namespace AirportTrafficControlTower.Service.Interfaces
         Task<IEnumerable<GetStationDto>> GetAllStationsStatus();
         Task<IEnumerable<GetFlightDto>> GetAllFlights();
         Task AddNewFlight(CreateFlightDto flight);
-        Task StartApp();
+        void StartApp();
     }
 }

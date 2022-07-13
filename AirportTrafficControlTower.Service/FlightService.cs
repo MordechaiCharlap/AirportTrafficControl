@@ -74,9 +74,9 @@ namespace AirportTrafficControlTower.Service
             return selectedFlight;
         }
 
-        public Task<bool> Update(Flight entity)
+        public async Task<bool> Update(Flight entity)
         {
-            throw new NotImplementedException();
+            return await _flightRepostory.Update(entity);
         }
     }
 }

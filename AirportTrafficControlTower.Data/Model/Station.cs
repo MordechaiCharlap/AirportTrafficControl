@@ -15,8 +15,6 @@ namespace AirportTrafficControlTower.Data.Model
             RouteDestinations = new HashSet<Route>();
             RouteSources = new HashSet<Route>();
         }
-
-        public int StationId { get; set; }
         [Key]
         public int StationNumber { get; set; }
         public int? OccupiedBy { get; set; }
