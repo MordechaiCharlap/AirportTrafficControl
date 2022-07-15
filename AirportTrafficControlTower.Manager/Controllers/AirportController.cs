@@ -58,6 +58,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
         [HttpPost]
         public async Task AddNewFlight(CreateFlightDto flight)
         {
+            //HostingEnvironment.QueueBackgroundWorkItem(() => AddNewFlight(flight));
             await _businessService.AddNewFlight(flight);
         }
     }

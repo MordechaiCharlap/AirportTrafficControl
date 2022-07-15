@@ -32,7 +32,7 @@ namespace AirportTrafficControlTower.Service
             throw new NotImplementedException();
         }
 
-        public async Task<Station?> Get(int id)
+        public Station? Get(int id)
         {
             return _stationRepository.GetById(id);
         }
@@ -48,7 +48,7 @@ namespace AirportTrafficControlTower.Service
                 FirstOrDefaultAsync(station => station.OccupiedBy == flightId);
         }
 
-        public async Task<bool> Update(Station entity)
+        public bool Update(Station entity)
         {
                 return _stationRepository.Update(entity);
         }

@@ -23,7 +23,7 @@ namespace AirportTrafficControlTower.Service
             await _liveUpdateRepository.SaveChangesAsync();
         }
 
-        public async Task<LiveUpdate?> Get(int id)
+        public LiveUpdate? Get(int id)
         {
             return _liveUpdateRepository.GetById(id);
         }

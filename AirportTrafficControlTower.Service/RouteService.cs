@@ -24,7 +24,7 @@ namespace AirportTrafficControlTower.Service
             await _routeRepository.SaveChangesAsync();
         }
 
-        public async Task<Route?> Get(int id)
+        public Route? Get(int id)
         {
             return _routeRepository.GetById(id);
         }
@@ -64,11 +64,6 @@ namespace AirportTrafficControlTower.Service
         }
 
         public Task<bool> Update(Route entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        Route? IService<Route>.Get(int id)
         {
             throw new NotImplementedException();
         }
