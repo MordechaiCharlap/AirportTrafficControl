@@ -21,7 +21,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<bool> Delete(int id)
+        public bool Delete(int id)
         {
             throw new NotImplementedException();
         }
@@ -31,7 +31,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             return _context.Routes;
         }
 
-        public Task<Route?> GetById(int id)
+        public Route? GetById(int id)
         {
             throw new NotImplementedException();
         }
@@ -41,7 +41,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task<bool> Update(Route entity)
+        public bool Update(Route entity)
         {
             throw new NotImplementedException();
         }

@@ -28,9 +28,9 @@ namespace AirportTrafficControlTower.Service
             await _flightRepostory.SaveChangesAsync();
         }
 
-        public async Task<Flight?> Get(int id)
+        public Flight? Get(int id)
         {
-            return await _flightRepostory.GetById(id);
+            return _flightRepostory.GetById(id);
         }
 
         public async Task<List<Flight>> GetAll()
@@ -45,7 +45,7 @@ namespace AirportTrafficControlTower.Service
                 var flightId = pointingStation.OccupiedBy;
                 if (flightId != null)
                 {
-                    Flight flightToCheck = await Get((int)flightId);
+                    Flight flightToCheck = Get((int)flightId);
                     if (flightToCheck!.TimerFinished == true)
                     {
                         if (selectedFlight == null) selectedFlight = flightToCheck;
@@ -76,7 +76,7 @@ namespace AirportTrafficControlTower.Service
 
         public async Task<bool> Update(Flight entity)
         {
-            return await _flightRepostory.Update(entity);
+            return _flightRepostory.Update(entity);
         }
     }
 }

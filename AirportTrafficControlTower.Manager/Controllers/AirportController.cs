@@ -23,9 +23,9 @@ namespace AirportTrafficControlTower.Manager.Controllers
             if (!_isWorking)
             {
                 _isWorking = true;
-                _businessService.StartApp();
+                await _businessService.StartApp();
             }
-               
+
         }
        
         [Route("[action]", Name = "GetAllFlights")]
@@ -41,6 +41,18 @@ namespace AirportTrafficControlTower.Manager.Controllers
         public async Task<IEnumerable<GetStationDto>> GetAllStationsStatus()
         {
             return await _businessService.GetAllStationsStatus();
+        }
+        [Route("[action]", Name = "AddNewFlightList")]
+        [HttpPost]
+        public async Task AddNewFlightList(List<CreateFlightDto> flights)
+        {
+            List<Task> tasks = new();
+            foreach (var flight in flights)
+            {
+                var task = AddNewFlight(flight);
+                tasks.Add(task);
+            }
+            await Task.WhenAll(tasks);
         }
         [Route("[action]", Name = "AddNewFlight")]
         [HttpPost]

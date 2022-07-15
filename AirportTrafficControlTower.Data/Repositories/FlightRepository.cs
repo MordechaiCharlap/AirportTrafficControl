@@ -19,9 +19,9 @@ namespace AirportTrafficControlTower.Data.Repositories
         {
             _context.Add(entity);
         }
-        public async Task<bool> Delete(int id)
+        public bool Delete(int id)
         {
-            var flight = await GetById(id);
+            var flight = GetById(id);
             if (flight == null) return false;
             else
             {
@@ -35,9 +35,9 @@ namespace AirportTrafficControlTower.Data.Repositories
             return _context.Flights;
         }
 
-        public async Task<Flight?> GetById(int id)
+        public Flight? GetById(int id)
         {
-            return await _context.Flights.FindAsync(id);
+            return _context.Flights.Find(id);
         }
 
         public async Task SaveChangesAsync()
@@ -45,9 +45,9 @@ namespace AirportTrafficControlTower.Data.Repositories
             await _context.SaveChangesAsync();
         }
 
-        public async Task<bool> Update(Flight entity)
+        public bool Update(Flight entity)
         {
-            var flight = await GetById(entity.FlightId);
+            var flight = GetById(entity.FlightId);
             if (flight == null) return false;
             else
             {

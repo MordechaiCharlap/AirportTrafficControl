@@ -26,7 +26,7 @@ namespace AirportTrafficControlTower.Service
 
         public async Task<Route?> Get(int id)
         {
-            return await _routeRepository.GetById(id);
+            return _routeRepository.GetById(id);
         }
 
         public async Task<List<Route>> GetAll()
@@ -46,21 +46,13 @@ namespace AirportTrafficControlTower.Service
             return pointingStations;
         }
 
-        public async Task<List<Route>> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
+        public List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
         {
-            var list = await _routeRepository.GetAll().Include(route => route.DestinationStation).ToListAsync();
-            list.ForEach(route =>
-            {
-                if (route.DestinationStation != null)
-                    Console.WriteLine(route.DestinationStation.StationNumber);
-            });
-            if (list[list.Count - 1].DestinationStation.OccupiedBy==null&& list[list.Count - 1].IsAscending==isAscending)
-                Console.WriteLine("True");
-            var list2 = await _routeRepository.GetAll().
+            var list2 = _routeRepository.GetAll().
                 Include(route => route.DestinationStation).
                 Where(route => route.Source == currentStationNumber &&
                       route.IsAscending == isAscending &&
-                      (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null)).ToListAsync();
+                      (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null)).ToList();
             return list2;
         }
 
@@ -72,6 +64,11 @@ namespace AirportTrafficControlTower.Service
         }
 
         public Task<bool> Update(Route entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        Route? IService<Route>.Get(int id)
         {
             throw new NotImplementedException();
         }

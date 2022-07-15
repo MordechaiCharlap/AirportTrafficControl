@@ -22,7 +22,7 @@ namespace AirportTrafficControlTower.Service
 
         public async Task ChangeOccupyBy(int stationNumber, int? flightId)
         {
-            var station = await _stationRepository.GetById(stationNumber);
+            var station = _stationRepository.GetById(stationNumber);
             station!.OccupiedBy=flightId;
             await _stationRepository.SaveChangesAsync();
         }
@@ -34,7 +34,7 @@ namespace AirportTrafficControlTower.Service
 
         public async Task<Station?> Get(int id)
         {
-            return await _stationRepository.GetById(id);
+            return _stationRepository.GetById(id);
         }
 
         public async Task<List<Station>> GetAll()
@@ -50,8 +50,12 @@ namespace AirportTrafficControlTower.Service
 
         public async Task<bool> Update(Station entity)
         {
-                return await _stationRepository.Update(entity);
+                return _stationRepository.Update(entity);
         }
-        
+
+        Station? IService<Station>.Get(int id)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

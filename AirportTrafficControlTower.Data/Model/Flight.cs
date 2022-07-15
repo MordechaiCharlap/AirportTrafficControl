@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 namespace AirportTrafficControlTower.Data.Model
 {
     [Table("Flight")]
-    public partial class Flight
+    public partial class Flight:IEntity
     {
         public Flight()
         {

@@ -25,7 +25,7 @@ namespace AirportTrafficControlTower.Service
 
         public async Task<LiveUpdate?> Get(int id)
         {
-            return await _liveUpdateRepository.GetById(id);
+            return _liveUpdateRepository.GetById(id);
         }
 
         public async Task<List<LiveUpdate>> GetAll()
@@ -34,6 +34,11 @@ namespace AirportTrafficControlTower.Service
         }
 
         public Task<bool> Update(LiveUpdate entity)
+        {
+            throw new NotImplementedException();
+        }
+
+        LiveUpdate? IService<LiveUpdate>.Get(int id)
         {
             throw new NotImplementedException();
         }
