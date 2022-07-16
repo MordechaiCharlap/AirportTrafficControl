@@ -5,7 +5,6 @@ using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using AirportTrafficControlTower.Data.Contexts;
 using AutoMapper;
-using Microsoft.AspNetCore.Hosting.Internal;
 
 namespace AirportTrafficControlTower.Service
 {
@@ -17,10 +16,10 @@ namespace AirportTrafficControlTower.Service
         private readonly IRouteService _routeService;
         private readonly IMapper _mapper;
         private readonly AirPortTrafficControlContext _context;
-        ICollection<Flight> _flightsCollection;
-        ICollection<LiveUpdate> _liveUpdatesCollection;
-        ICollection<Route> _routesCollection;
-        ICollection<Station> _stationsCollection;
+        List<Flight> _flightsCollection;
+        List<LiveUpdate> _liveUpdatesCollection;
+        List<Route> _routesCollection;
+        List<Station> _stationsCollection;
         private object obj = new object();
 
 
@@ -104,7 +103,7 @@ namespace AirportTrafficControlTower.Service
         public List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
         {
             var list2 = new List<Route>();
-            _routesCollection.ToList().ForEach(route =>
+            _routesCollection.ForEach(route =>
             {
                 if (route.Source == currentStationNumber && route.IsAscending == isAscending && (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null))
                     list2.Add(route);
@@ -174,7 +173,7 @@ namespace AirportTrafficControlTower.Service
                     ContextFunctionsLock(1,enteringUpdate);
                     Console.WriteLine($"Flight {flight.FlightId} enters station {nextStation!.StationNumber}, station {nextStation.StationNumber} is occupied by {nextStation.OccupiedBy}");
 
-                    HostingEnvironment.QueueBackgroundWorkItem
+                    //HostingEnvironment.QueueBackgroundWorkItem()
                     task = StartTime(flight);
                 }
                 else
@@ -215,6 +214,12 @@ namespace AirportTrafficControlTower.Service
                     case 4:
                         UpdateFlight((Flight)entity);
                         break;
+                    case 5:
+                        UpdateFlight((Flight)entity);
+                        break;
+                    case 6:
+                        UpdateFlight((Flight)entity);
+                        break;
                 }
             }
 
@@ -247,8 +252,8 @@ namespace AirportTrafficControlTower.Service
 
         private async Task SendWaitingInLineFlightIfPossible(Station currentStation)
         {
-            var sourcesStations = _routeService.GetPointingStations(currentStation);
-            bool? isFirstAscendingStation = _routeService.IsFirstAscendingStation(currentStation);
+            var sourcesStations= GetPointingStations(currentStation);
+            bool? isFirstAscendingStation = IsFirstAscendingStation(currentStation);
             var selectedFlight = GetFirstFlightInQueue(sourcesStations, isFirstAscendingStation);
             if (selectedFlight != null)
             {
@@ -256,7 +261,23 @@ namespace AirportTrafficControlTower.Service
                 await MoveNextIfPossible(selectedFlight);
             }
         }
-
+        private List<Station> GetPointingStations(Station station)
+        {
+            List<Station> pointingStations = new();
+            _routesCollection.ForEach(route=>{
+                if (route.Destination == station.StationNumber && route.Source != null)
+                {
+                    pointingStations.Add(route.SourceStation!);
+                }
+            });
+            return pointingStations;
+        }
+        private bool? IsFirstAscendingStation(Station currentStation)
+        {
+            var waitingRoute = _routesCollection.FirstOrDefault(route => route.Destination == currentStation.StationNumber &&
+                                                                 route.Source == null);
+            return waitingRoute == null ? null : waitingRoute.IsAscending;
+        }
 
         private async Task StartTime(Flight flight)
         {

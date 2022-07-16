@@ -52,10 +52,5 @@ namespace AirportTrafficControlTower.Service
         {
                 return _stationRepository.Update(entity);
         }
-
-        Station? IService<Station>.Get(int id)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

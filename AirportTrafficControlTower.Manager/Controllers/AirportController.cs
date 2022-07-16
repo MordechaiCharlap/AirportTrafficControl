@@ -3,6 +3,7 @@ using AirportTrafficControlTower.Data.Model;
 using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Hangfire;
 
 namespace AirportTrafficControlTower.Manager.Controllers
 {
@@ -11,10 +12,12 @@ namespace AirportTrafficControlTower.Manager.Controllers
     public class AirportController : ControllerBase
     {
         private readonly IBusinessService _businessService;
+        private readonly IBackgroundJobClient backgroundJobClient;
         private bool _isWorking = false;
-        public AirportController(IBusinessService businessService)
+        public AirportController(IBusinessService businessService, IBackgroundJobClient backgroundJobClient)
         {
             _businessService = businessService;
+            this.backgroundJobClient = backgroundJobClient;
         }
         [Route("[action]", Name = "StartApp")]
         [HttpPost]
@@ -23,11 +26,12 @@ namespace AirportTrafficControlTower.Manager.Controllers
             if (!_isWorking)
             {
                 _isWorking = true;
+                var addFlight = BackgroundJob.Enqueue(() => _businessService.StartApp());
                 await _businessService.StartApp();
             }
 
         }
-       
+
         [Route("[action]", Name = "GetAllFlights")]
         [HttpGet]
         public async Task<IEnumerable<GetFlightDto>> GetAllFlights()
@@ -59,7 +63,8 @@ namespace AirportTrafficControlTower.Manager.Controllers
         public async Task AddNewFlight(CreateFlightDto flight)
         {
             //HostingEnvironment.QueueBackgroundWorkItem(() => AddNewFlight(flight));
-            await _businessService.AddNewFlight(flight);
+            var addFlight = BackgroundJob.Enqueue(() => _businessService.AddNewFlight(flight));
+            //await _businessService.AddNewFlight(flight);
         }
     }
 }

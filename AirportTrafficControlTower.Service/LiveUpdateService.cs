@@ -33,12 +33,7 @@ namespace AirportTrafficControlTower.Service
             return await _liveUpdateRepository.GetAll().ToListAsync();
         }
 
-        public Task<bool> Update(LiveUpdate entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        LiveUpdate? IService<LiveUpdate>.Get(int id)
+        public bool Update(LiveUpdate entity)
         {
             throw new NotImplementedException();
         }

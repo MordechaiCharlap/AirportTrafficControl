@@ -63,7 +63,7 @@ namespace AirportTrafficControlTower.Service
             return waitingRoute == null ? null : waitingRoute.IsAscending;
         }
 
-        public Task<bool> Update(Route entity)
+        public bool Update(Route entity)
         {
             throw new NotImplementedException();
         }
