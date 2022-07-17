@@ -7,8 +7,6 @@ using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.SqlServer;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -19,6 +17,16 @@ builder.Services.AddDbContext<AirPortTrafficControlContext>(options =>
 }, ServiceLifetime.Transient);
 
 builder.Services.AddControllers();
+builder.Services.AddCors(options => {
+    options.AddPolicy("myPolicy",
+                      policy => {
+                          policy
+                            .WithOrigins("https://localhost:7237")
+                            //.AllowAnyOrigin()
+                            .AllowAnyMethod()
+                            .AllowAnyHeader();
+                      });
+});
 //.AddNewtonsoftJson(jsonOptions =>
 // {
 //     jsonOptions.SerializerSettings.Converters.Add(new StringEnumConverter());
@@ -60,6 +68,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseRouting();
+app.UseCors("myPolicy");
+app.UseAuthentication();
 app.UseHangfireDashboard();
 app.UseHttpsRedirection();
 

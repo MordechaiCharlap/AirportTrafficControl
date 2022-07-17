@@ -4,9 +4,11 @@ using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
+using Microsoft.AspNetCore.Cors;
 
 namespace AirportTrafficControlTower.Manager.Controllers
 {
+    [EnableCors("myPolicy")]
     [ApiController]
     [Route("api/[controller]")]
     public class AirportController : ControllerBase
@@ -19,17 +21,23 @@ namespace AirportTrafficControlTower.Manager.Controllers
         }
         [Route("[action]", Name = "StartApp")]
         [HttpPost]
-        public void StartApp()
+        public async Task StartApp()
         {
             if (!_isWorking)
             {
                 _isWorking = true;
-                var startApp = BackgroundJob.Enqueue(() => _businessService.StartApp());
-                //await _businessService.StartApp();
+                //var startApp = BackgroundJob.Enqueue(() => _businessService.StartApp());
+                await _businessService.StartApp();
             }
 
         }
-
+        [Route("[action]", Name = "GetPendingFlightsByAsc")]
+        [HttpGet]
+        public List<GetFlightDto> GetPendingFlightsByAsc()
+        {
+            var list = _businessService.GetAllFlights();
+            return list;
+        }
         [Route("[action]", Name = "GetAllFlights")]
         [HttpGet]
         public  List<GetFlightDto> GetAllFlights()

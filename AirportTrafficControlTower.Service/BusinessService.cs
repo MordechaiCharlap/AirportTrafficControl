@@ -38,7 +38,6 @@ namespace AirportTrafficControlTower.Service
             _liveUpdatesCollection = _context.LiveUpdates.ToList();
             _routesCollection = _context.Routes.Include(route => route.DestinationStation).Include(route => route.SourceStation).ToList();
             _stationsCollection = _context.Stations.ToList();
-            //ExitEvent += (s, args) => SaveChanges();
         }
 
         public async Task StartApp()
@@ -50,11 +49,14 @@ namespace AirportTrafficControlTower.Service
                 if (station.OccupiedBy != null)
                 {
                     var flight = _flightsCollection.First(flight => station.OccupiedBy == flight.FlightId);
-                    //BackgroundJob.Enqueue(() => StartTime(flight));
                     var task = StartTime(flight);
                     allTasks.Add(task);
                 }
             }
+            var ascFirstFlight = _flightsCollection.FirstOrDefault(flight => flight.IsPending == true && flight.IsAscending);
+            var descFirstFlight = _flightsCollection.FirstOrDefault(flight => flight.IsPending == true && !flight.IsAscending);
+            if(ascFirstFlight!=null) allTasks.Add(MoveNextIfPossible(ascFirstFlight));
+            if(descFirstFlight != null) allTasks.Add(MoveNextIfPossible(descFirstFlight));
             await Task.WhenAll(allTasks);
         }
         public async Task AddNewFlight(CreateFlightDto flightDto)
@@ -65,7 +67,10 @@ namespace AirportTrafficControlTower.Service
                 var newFlight = _mapper.Map<Flight>(flightDto);
                 ContextFunctionsLock(2, newFlight);
                 _flightsCollection.Add(newFlight);
-                list.Add(MoveNextIfPossible(newFlight));
+                if (newFlight == _flightsCollection.First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending))
+                {
+                    list.Add(MoveNextIfPossible(newFlight));
+                }
             }
             await Task.WhenAll(list);
             //var newFlight = _mapper.Map<Flight>(flightDto);
@@ -230,7 +235,6 @@ namespace AirportTrafficControlTower.Service
             lock (obj)
             {
             return _context.Stations.Find(number);
-
             }
         }
         private void SaveNewLiveUpdate(LiveUpdate update)
@@ -348,7 +352,7 @@ namespace AirportTrafficControlTower.Service
             }
             else
             {
-                Console.WriteLine($"{selectedFlight} is the first line in queue");
+                Console.WriteLine($"{selectedFlight.FlightId} is the first line in queue");
                 return selectedFlight;
             }
         }
