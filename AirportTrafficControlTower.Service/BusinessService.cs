@@ -5,6 +5,7 @@ using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using AirportTrafficControlTower.Data.Contexts;
 using AutoMapper;
+using Hangfire;
 
 namespace AirportTrafficControlTower.Service
 {
@@ -42,14 +43,14 @@ namespace AirportTrafficControlTower.Service
 
         public async Task StartApp()
         {
-            List<Station> allStations = await _stationService.GetAll();
+            List<Station> allStations = _stationsCollection;
             List<Task> allTasks = new();
             foreach (Station station in allStations)
             {
                 if (station.OccupiedBy != null)
                 {
-                    //var flight = await _flightService.Get((int)station.OccupiedBy!);
                     var flight = _flightsCollection.First(flight => station.OccupiedBy == flight.FlightId);
+                    //BackgroundJob.Enqueue(() => StartTime(flight));
                     var task = StartTime(flight);
                     allTasks.Add(task);
                 }
@@ -58,34 +59,37 @@ namespace AirportTrafficControlTower.Service
         }
         public async Task AddNewFlight(CreateFlightDto flightDto)
         {
-            var newFlight = _mapper.Map<Flight>(flightDto);
-            //await _flightService.Create(newFlight);
-            //newFlight.IsPending = true;
-            //newFlight.IsDone = false;
-            //newFlight.SubmissionTime = DateTime.Now;
-            ContextFunctionsLock(2,newFlight);
-            _flightsCollection.Add(newFlight);
-            await MoveNextIfPossible(newFlight);
-            Console.WriteLine($"asc = {newFlight.IsAscending} pend = {newFlight.IsPending} flightId = {newFlight.FlightId}");
+            List<Task> list = new();
+            for(int i = 0; i < 10; i++)
+            {
+                var newFlight = _mapper.Map<Flight>(flightDto);
+                ContextFunctionsLock(2, newFlight);
+                _flightsCollection.Add(newFlight);
+                list.Add(MoveNextIfPossible(newFlight));
+            }
+            await Task.WhenAll(list);
+            //var newFlight = _mapper.Map<Flight>(flightDto);
+            //ContextFunctionsLock(2, newFlight);
+            //_flightsCollection.Add(newFlight);
+            //var addFlight = BackgroundJob.Enqueue(() => MoveNextIfPossible(newFlight));
+            //if (newFlight == _flightsCollection.First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending))
+            //await MoveNextIfPossible(newFlight);
+            //Console.WriteLine($"asc = {newFlight.IsAscending} pend = {newFlight.IsPending} flightId = {newFlight.FlightId}");
         }
-        //public async Task AddNewFlight(CreateFlightDto flightDto)
-        //{
-        //    var newFlight = _mapper.Map<Flight>(flightDto);
-        //    await _flightService.Create(newFlight);
-        //    await MoveNextIfPossible(newFlight);
-        //    Console.WriteLine($"asc = {newFlight.IsAscending} pend = {newFlight.IsPending} flightId = {newFlight.FlightId}");
-        //}
 
-        public async Task<IEnumerable<GetFlightDto>> GetAllFlights()
+        public List<GetFlightDto> GetAllFlights()
         {
-            var flightsList = _flightService.GetAll();
-            await Task.Delay(1000);
-            return new List<GetFlightDto>();
-            //flightDto mapper.Map<Flight>(GetFlightDto);
+            var dtoFlightsList = new List<GetFlightDto>();
+            _flightsCollection.ForEach(flight =>
+            {
+                var flightDto = _mapper.Map<GetFlightDto>(flight);
+                dtoFlightsList.Add(flightDto);
+            });
+            return dtoFlightsList;
 
         }
 
-        public async Task<IEnumerable<GetStationDto>> GetAllStationsStatus()
+        public async Task<List<GetStationDto>> GetAllStationsStatus()
         {
             List<Station> list = await _stationService.GetAll();
             List<GetStationDto> listDtos = new();
@@ -96,7 +100,7 @@ namespace AirportTrafficControlTower.Service
             return listDtos;
         }
 
-        public async Task<IEnumerable<GetFlightDto>> GetFinishedRoutesHistory()
+        public async Task<List<GetFlightDto>> GetFinishedRoutesHistory()
         {
             throw new NotImplementedException();
         }
@@ -110,11 +114,12 @@ namespace AirportTrafficControlTower.Service
             });
             return list2;
         }
-        private async Task MoveNextIfPossible(Flight flight)
+        public async Task MoveNextIfPossible(Flight flight)
         {
             Task task = null;
             Console.WriteLine($"Flight {flight.FlightId} is trying to move next");
             Station? nextStation = null;
+
             var currentStation = _stationsCollection.FirstOrDefault(station => station.OccupiedBy == flight.FlightId);
             int? currentStationNumber = currentStation != null ? currentStation.StationNumber : null;
             var nextRoutes = GetRoutesByCurrentStationAndAsc(currentStationNumber, flight.IsAscending);
@@ -127,25 +132,28 @@ namespace AirportTrafficControlTower.Service
                     {
                         success = true;
                         flight.IsDone = true;
-                        ContextFunctionsLock(4,flight);
+                        ContextFunctionsLock(4, flight);
                         Console.WriteLine($"Flight {flight.FlightId} is done");
                     }
                     else
                     {
-                        nextStation = _stationsCollection.First(station => station.StationNumber == (int)route.Destination!);
+                        nextStation = GetStation((int)route.Destination!);
+                        //nextStation = _stationsCollection.First(station => station.StationNumber == (int)route.Destination!);
                         Console.WriteLine($"Checking if station {nextStation.StationNumber} is empty");
+
                         if (nextStation.OccupiedBy == null)
                         {
                             Console.WriteLine($"{nextStation.StationNumber} is empty");
 
                             success = true;
                             nextStation.OccupiedBy = flight.FlightId;
-                            ContextFunctionsLock(3,nextStation);
+                            ContextFunctionsLock(3, nextStation);
                             Console.WriteLine($"Station {nextStation.StationNumber} is now filled by {flight.FlightId}");
                         }
                         else
                             Console.WriteLine($"{nextStation.StationNumber} is not empty");
                     }
+
                 }
             }
             if (success)
@@ -155,7 +163,7 @@ namespace AirportTrafficControlTower.Service
                 if (flight.IsPending)
                 {
                     flight.IsPending = false;
-                    ContextFunctionsLock(4,flight);
+                    ContextFunctionsLock(4, flight);
                     Console.WriteLine($"Flight {flight.FlightId} started the route");
                 }
                 else
@@ -163,29 +171,28 @@ namespace AirportTrafficControlTower.Service
 
                     LiveUpdate leavingUpdate = new() { FlightId = flight.FlightId, IsEntering = false, StationId = currentStation!.StationNumber, UpdateTime = DateTime.Now };
                     _liveUpdatesCollection.Add(leavingUpdate);
-                    ContextFunctionsLock(1,leavingUpdate);
+                    ContextFunctionsLock(1, leavingUpdate);
                     Console.WriteLine($"Flight {flight.FlightId} left station {currentStation!.StationNumber}");
                 }
                 if (!flight.IsDone)
                 {
                     LiveUpdate enteringUpdate = new() { FlightId = flight.FlightId, IsEntering = true, StationId = nextStation!.StationNumber, UpdateTime = DateTime.Now };
                     _liveUpdatesCollection.Add(enteringUpdate);
-                    ContextFunctionsLock(1,enteringUpdate);
+                    ContextFunctionsLock(1, enteringUpdate);
                     Console.WriteLine($"Flight {flight.FlightId} enters station {nextStation!.StationNumber}, station {nextStation.StationNumber} is occupied by {nextStation.OccupiedBy}");
-
-                    //HostingEnvironment.QueueBackgroundWorkItem()
                     task = StartTime(flight);
+                    //var startTimer = BackgroundJob.Enqueue(() => StartTime(flight));
                 }
                 else
                 {
                     flight.TimerFinished = null;
-                    ContextFunctionsLock(4,flight);
+                    ContextFunctionsLock(4, flight);
                     Console.WriteLine($"Flight {flight.FlightId} finished the route");
                 }
                 if (currentStation != null)
                 {
                     currentStation.OccupiedBy = null;
-                    ContextFunctionsLock(3,currentStation);
+                    ContextFunctionsLock(3, currentStation);
                     Console.WriteLine($"{currentStation.StationNumber} is now available, trying to find new flight to get in");
                     await SendWaitingInLineFlightIfPossible(currentStation);
                 }
@@ -214,15 +221,17 @@ namespace AirportTrafficControlTower.Service
                     case 4:
                         UpdateFlight((Flight)entity);
                         break;
-                    case 5:
-                        UpdateFlight((Flight)entity);
-                        break;
-                    case 6:
-                        UpdateFlight((Flight)entity);
-                        break;
                 }
             }
 
+        }
+        private Station? GetStation(int number)
+        {
+            lock (obj)
+            {
+            return _context.Stations.Find(number);
+
+            }
         }
         private void SaveNewLiveUpdate(LiveUpdate update)
         {
@@ -252,7 +261,7 @@ namespace AirportTrafficControlTower.Service
 
         private async Task SendWaitingInLineFlightIfPossible(Station currentStation)
         {
-            var sourcesStations= GetPointingStations(currentStation);
+            var sourcesStations = GetPointingStations(currentStation);
             bool? isFirstAscendingStation = IsFirstAscendingStation(currentStation);
             var selectedFlight = GetFirstFlightInQueue(sourcesStations, isFirstAscendingStation);
             if (selectedFlight != null)
@@ -264,7 +273,8 @@ namespace AirportTrafficControlTower.Service
         private List<Station> GetPointingStations(Station station)
         {
             List<Station> pointingStations = new();
-            _routesCollection.ForEach(route=>{
+            _routesCollection.ForEach(route =>
+            {
                 if (route.Destination == station.StationNumber && route.Source != null)
                 {
                     pointingStations.Add(route.SourceStation!);
@@ -274,22 +284,20 @@ namespace AirportTrafficControlTower.Service
         }
         private bool? IsFirstAscendingStation(Station currentStation)
         {
-            var waitingRoute = _routesCollection.FirstOrDefault(route => route.Destination == currentStation.StationNumber &&
-                                                                 route.Source == null);
+            var waitingRoute = _routesCollection.FirstOrDefault(route => route.Destination == currentStation.StationNumber && route.Source == null);
             return waitingRoute == null ? null : waitingRoute.IsAscending;
         }
 
-        private async Task StartTime(Flight flight)
+        public async Task StartTime(Flight flight)
         {
             flight.TimerFinished = false;
-            ContextFunctionsLock(4,flight);
+            ContextFunctionsLock(4, flight);
             Console.WriteLine($"{flight.FlightId} timer started");
             var rand = new Random();
-            await Task.Delay(rand.Next(3000, 10000));
-            //Thread.Sleep(rand.Next(3000, 10000));
+            await Task.Delay(rand.Next(4000, 10000));
             Console.WriteLine($"{flight.FlightId} timer finished");
             flight.TimerFinished = true;
-            ContextFunctionsLock(4,flight);
+            ContextFunctionsLock(4, flight);
             Console.WriteLine("Before Move Next function");
             await MoveNextIfPossible(flight);
         }
@@ -317,14 +325,20 @@ namespace AirportTrafficControlTower.Service
 
             if (isFirstAscendingStation != null)
             {
+                Console.WriteLine("Trying to find a plane in the list to start the route");
                 var pendingFirstFlight = _flightsCollection.FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation && flight.IsPending == true);
                 if (pendingFirstFlight != null)
                 {
+                    Console.WriteLine("Found a flight in the list");
                     if (selectedFlight == null) selectedFlight = pendingFirstFlight;
                     else
                     {
                         if (selectedFlight.SubmissionTime >= pendingFirstFlight.SubmissionTime) selectedFlight = pendingFirstFlight;
                     }
+                }
+                else
+                {
+                    Console.WriteLine("Have Not Found a flight in the list");
                 }
             }
             if (selectedFlight == null)

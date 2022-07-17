@@ -18,7 +18,7 @@ namespace AirportTrafficControlTower.Data.Model
         public bool IsEntering { get; set; }
 
         [ForeignKey("FlightId")]
-        [InverseProperty("LiveUpdates")]
+        //[InverseProperty("LiveUpdates")]
         public virtual Flight Flight { get; set; } = null!;
         [ForeignKey("StationId")]
         [InverseProperty("LiveUpdates")]

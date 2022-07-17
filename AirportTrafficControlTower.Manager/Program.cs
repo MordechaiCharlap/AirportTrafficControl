@@ -7,6 +7,8 @@ using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using Hangfire;
 using Hangfire.SqlServer;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Converters;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,11 @@ builder.Services.AddDbContext<AirPortTrafficControlContext>(options =>
 }, ServiceLifetime.Transient);
 
 builder.Services.AddControllers();
+//.AddNewtonsoftJson(jsonOptions =>
+// {
+//     jsonOptions.SerializerSettings.Converters.Add(new StringEnumConverter());
+//     jsonOptions.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
+// });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -31,7 +38,6 @@ builder.Services.AddScoped<IRepository<Flight>, FlightRepository>();
 builder.Services.AddScoped<IRepository<AirportTrafficControlTower.Data.Model.Route>, RouteRepository>();
 builder.Services.AddRouting();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-
 var connectionString = builder.Configuration.GetConnectionString("AirPortDataConnectionString");
 builder.Services.AddHangfire(configuration => configuration
         .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
