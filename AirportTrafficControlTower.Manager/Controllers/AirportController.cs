@@ -31,11 +31,11 @@ namespace AirportTrafficControlTower.Manager.Controllers
             }
 
         }
-        [Route("[action]", Name = "GetPendingFlightsByAsc")]
+        [Route("[action]/{isAsc:bool}", Name = "GetPendingFlightsByAsc")]
         [HttpGet]
-        public List<GetFlightDto> GetPendingFlightsByAsc()
+        public async Task<List<GetFlightDto>> GetPendingFlightsByAsc(bool isAsc)
         {
-            var list = _businessService.GetAllFlights();
+            var list = await _businessService.GetPendingFlightsByAsc(isAsc);
             return list;
         }
         [Route("[action]", Name = "GetAllFlights")]

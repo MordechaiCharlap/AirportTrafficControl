@@ -21,12 +21,11 @@ namespace AirportTrafficControlTower.Client.Controllers
         {
             return View();
         }
-        public async Task<IActionResult> GetPendingFlightsByAsc()
+        public async Task<IActionResult> GetPendingFlightsByAsc(bool isAsc)
         {
             List<GetFlightDto> flightList = new();
             HttpClient client = _api.Initial();
-            var isAsc = true;
-            HttpResponseMessage res = await client.GetAsync("api/Airport/GetPendingFlightsByAsc");
+            HttpResponseMessage res = await client.GetAsync($"api/Airport/GetPendingFlightsByAsc/{isAsc}");
             if (res.IsSuccessStatusCode)
             {
                 var result = res.Content.ReadAsStringAsync().Result;
@@ -38,8 +37,6 @@ namespace AirportTrafficControlTower.Client.Controllers
 
 
             return View(flightList);
-
-
         }
 
     }

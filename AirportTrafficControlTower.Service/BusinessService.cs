@@ -104,11 +104,6 @@ namespace AirportTrafficControlTower.Service
             });
             return listDtos;
         }
-
-        public async Task<List<GetFlightDto>> GetFinishedRoutesHistory()
-        {
-            throw new NotImplementedException();
-        }
         public List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
         {
             var list2 = new List<Route>();
@@ -357,6 +352,15 @@ namespace AirportTrafficControlTower.Service
             }
         }
 
-
+        public async Task<List<GetFlightDto>> GetPendingFlightsByAsc(bool isAsc)
+        {
+            List<GetFlightDto> listDto = new();
+            var list = await _context.Flights.Where(flight => flight.IsPending == true && flight.IsAscending == isAsc).ToListAsync();
+            list.ForEach(flight =>
+            {
+                listDto.Add(_mapper.Map<GetFlightDto>(flight));
+            });
+            return listDto;
+        }
     }
 }

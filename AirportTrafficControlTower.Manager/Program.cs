@@ -27,11 +27,6 @@ builder.Services.AddCors(options => {
                             .AllowAnyHeader();
                       });
 });
-//.AddNewtonsoftJson(jsonOptions =>
-// {
-//     jsonOptions.SerializerSettings.Converters.Add(new StringEnumConverter());
-//     jsonOptions.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore;
-// });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
@@ -73,8 +68,13 @@ app.UseCors("myPolicy");
 app.UseAuthentication();
 app.UseHangfireDashboard();
 app.UseHttpsRedirection();
-
 app.UseAuthorization();
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}");
+});
 
 app.MapControllers();
 

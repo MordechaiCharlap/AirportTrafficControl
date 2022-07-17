@@ -5,4 +5,11 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    
+     <div class="flex-row">
+        <button>Live Updates History</button>
+        <a class="btn btn-sm btn-outline-secondary" asp-action="GetPendingFlightsByAsc" asp-route-isAsc="true">Pending Take-offs</a>
+        <a class="btn btn-sm btn-outline-secondary" asp-action="GetPendingFlightsByAsc" asp-route-isAsc="false">Pending Descending-flights</a>
+    </div>
+
 </div>
