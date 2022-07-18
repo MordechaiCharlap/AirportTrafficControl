@@ -48,9 +48,16 @@ namespace AirportTrafficControlTower.Manager.Controllers
         }
         [Route("[action]", Name = "GetAllStationsStatus")]
         [HttpGet]
-        public async Task<IEnumerable<GetStationDto>> GetAllStationsStatus()
+        public async Task<List<Station>> GetAllStationsStatus()
         {
             return await _businessService.GetAllStationsStatus();
+        }
+        [Route("[action]", Name = "SeeAllLiveUpdates")]
+        [HttpGet]
+        public async Task<List<LiveUpdate>> GetAllLiveUpdates()
+        {
+            var list = await _businessService.GetAllLiveUpdates();
+            return list;
         }
         [Route("[action]", Name = "AddNewFlightList")]
         [HttpPost]

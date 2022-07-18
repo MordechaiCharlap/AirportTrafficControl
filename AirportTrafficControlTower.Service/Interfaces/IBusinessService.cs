@@ -10,10 +10,11 @@ namespace AirportTrafficControlTower.Service.Interfaces
 {
     public interface IBusinessService
     {
-        Task<List<GetStationDto>> GetAllStationsStatus();
+        Task<List<Station>> GetAllStationsStatus();
         List<GetFlightDto> GetAllFlights();
         Task AddNewFlight(CreateFlightDto flight);
         Task StartApp();
         Task<List<GetFlightDto>> GetPendingFlightsByAsc(bool isAsc);
+        Task<List<LiveUpdate>> GetAllLiveUpdates();
     }
 }

@@ -94,15 +94,9 @@ namespace AirportTrafficControlTower.Service
 
         }
 
-        public async Task<List<GetStationDto>> GetAllStationsStatus()
+        public async Task<List<Station>> GetAllStationsStatus()
         {
-            List<Station> list = await _stationService.GetAll();
-            List<GetStationDto> listDtos = new();
-            list.ForEach(station =>
-            {
-                listDtos.Add(_mapper.Map<GetStationDto>(station));
-            });
-            return listDtos;
+            return await _stationService.GetAll();
         }
         public List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
         {
@@ -361,6 +355,11 @@ namespace AirportTrafficControlTower.Service
                 listDto.Add(_mapper.Map<GetFlightDto>(flight));
             });
             return listDto;
+        }
+
+        public async Task<List<LiveUpdate>> GetAllLiveUpdates()
+        {
+            return await _liveUpdateService.GetAll();
         }
     }
 }

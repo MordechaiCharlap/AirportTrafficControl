@@ -1,9 +1,10 @@
-﻿@model IEnumerable<AirportTrafficControlTower.Service.Dtos.GetFlightDto>
+﻿@model IEnumerable<AirportTrafficControlTower.Data.Model.LiveUpdate>
 
 @{
+    ViewData["Title"] = "SeeAllLiveUpdates";
 }
 
-<h1>@ViewData["Title"]</h1>
+<h1>SeeAllLiveUpdates</h1>
 
 <p>
     <a asp-action="Create">Create New</a>
@@ -12,19 +13,19 @@
     <thead>
         <tr>
             <th>
+                @Html.DisplayNameFor(model => model.LiveUpdateId)
+            </th>
+            <th>
                 @Html.DisplayNameFor(model => model.FlightId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsAscending)
+                @Html.DisplayNameFor(model => model.StationId)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsPending)
+                @Html.DisplayNameFor(model => model.UpdateTime)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.IsDone)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.SubmissionTime)
+                @Html.DisplayNameFor(model => model.IsEntering)
             </th>
             <th></th>
         </tr>
@@ -33,19 +34,19 @@
 @foreach (var item in Model) {
         <tr>
             <td>
+                @Html.DisplayFor(modelItem => item.LiveUpdateId)
+            </td>
+            <td>
                 @Html.DisplayFor(modelItem => item.FlightId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsAscending)
+                @Html.DisplayFor(modelItem => item.StationId)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsPending)
+                @Html.DisplayFor(modelItem => item.UpdateTime)
             </td>
             <td>
-                @Html.DisplayFor(modelItem => item.IsDone)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.SubmissionTime)
+                @Html.DisplayFor(modelItem => item.IsEntering)
             </td>
             <td>
                 @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
