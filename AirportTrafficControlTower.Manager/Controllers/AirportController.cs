@@ -59,6 +59,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
             var list = await _businessService.GetAllLiveUpdates();
             return list;
         }
+
         [Route("[action]", Name = "AddNewFlightList")]
         [HttpPost]
         public async Task AddNewFlightList(int num, bool isAsc)

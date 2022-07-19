@@ -1,13 +1,37 @@
 ﻿@model IEnumerable<AirportTrafficControlTower.Data.Model.Station>
+<script type="text/javascript">
+    $(document).ready(function(){
+        $('.occupyLine').html("test1");
+        //setInterval(function(){
+            $.ajax({
+                type: 'Get',
+                url: '@Url.Action("LoadStations")',
+                dataType: 'json',
+                contentType: "application/json;charset=utf-8",
+                success: function(data) {
+                    console.log(data);
+                },
+                error: function(response) {
+                    debugger;
+                    alert('error');
+                }
+            });
+        //}, 5000);
+    });
 
+</script>
 @{
     ViewData["Title"] = "GetAllStationsStatus";
 }
 
 <h1>GetAllStationsStatus</h1>
 
+<div class="testDiv">
+    <div>hello</div>
+    <h1>TestText</h1>
+</div>
 <p>
-    <a asp-action="Create">Create New</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-action="AddFlight">Add Flight</a>
 </p>
 <table class="table">
     <thead>
@@ -22,20 +46,16 @@
         </tr>
     </thead>
     <tbody>
-@foreach (var item in Model) {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.StationNumber)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.OccupiedBy)
-            </td>
-            <td>
-                @Html.ActionLink("Edit", "Edit", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Details", "Details", new { /* id=item.PrimaryKey */ }) |
-                @Html.ActionLink("Delete", "Delete", new { /* id=item.PrimaryKey */ })
-            </td>
-        </tr>
-}
+        @foreach (var item in Model)
+        {
+            <tr class="tableLine">
+                <td>
+                    @Html.DisplayFor(modelItem => item.StationNumber)
+                </td>
+                <td class="occupyLine">
+                    @Html.DisplayFor(modelItem => item.OccupiedBy)
+                </td>
+            </tr>
+        }
     </tbody>
 </table>
