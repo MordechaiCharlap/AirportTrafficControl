@@ -26,10 +26,8 @@ namespace AirportTrafficControlTower.Manager.Controllers
             if (!_isWorking)
             {
                 _isWorking = true;
-                //var startApp = BackgroundJob.Enqueue(() => _businessService.StartApp());
                 await _businessService.StartApp();
             }
-
         }
         [Route("[action]/{isAsc:bool}", Name = "GetPendingFlightsByAsc")]
         [HttpGet]

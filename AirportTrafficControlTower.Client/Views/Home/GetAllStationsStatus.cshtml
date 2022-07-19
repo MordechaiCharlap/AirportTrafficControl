@@ -1,4 +1,8 @@
 ﻿@model IEnumerable<AirportTrafficControlTower.Data.Model.Station>
+<link rel="stylesheet" href="~/css/stationStatus.css" asp-append-version="true" />
+@{
+    ViewData["Title"] = "GetAllStationsStatus";
+}
 <script type="text/javascript">
     $(document).ready(function(){
         setInterval(function(){
@@ -9,7 +13,8 @@
                 contentType: "application/json;charset=utf-8",
                 success: function(response) {
                     $.each(response.stationList, function(index, station){
-                        $(".occupyLine:eq("+index+")").html(station.occupiedBy);
+                            $(".flightInStation:eq("+index+")").html(station.occupiedBy);
+
                     });
                 },
                 error: function(response) {
@@ -21,19 +26,30 @@
     });
 
 </script>
-@{
-    ViewData["Title"] = "GetAllStationsStatus";
-}
 
-<h1>GetAllStationsStatus</h1>
-
-<div class="testDiv">
-    <div>hello</div>
-    <h1>TestText</h1>
-</div>
 <p>
     <a class="btn btn-sm btn-outline-secondary" asp-action="AddFlight">Add Flight</a>
 </p>
+<div class="d-flex justify-content-center">
+    <div class="d-flex flex-wrap justify-content-between col-8">
+        @foreach (var item in Model)
+        {
+            var className = "bi bi-" + @item.StationNumber + "-square-fill";
+            var flight = @item.OccupiedBy;
+            <div class="card station">
+                <div class="card-header d-flex justify-content-center">
+                    @*<i class="bi bi-1-square-fill"></i>*@
+                    <i class="@className"></i>
+                </div>
+                <div class="card-body">
+                    <p class="card-text">Flight in station:</p>
+                    <p class="card-text flightInStation">@flight</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
 <table class="table">
     <thead>
         <tr>

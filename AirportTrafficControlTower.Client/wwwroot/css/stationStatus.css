@@ -1,0 +1,9 @@
+﻿body {
+}
+.station{
+    width:20%;
+    margin:.5rem;
+}
+.card-body{
+    height: 6rem;
+}
