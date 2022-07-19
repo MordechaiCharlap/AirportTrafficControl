@@ -287,7 +287,7 @@ namespace AirportTrafficControlTower.Service
             ContextFunctionsLock(4, flight);
             Console.WriteLine($"{flight.FlightId} timer started");
             var rand = new Random();
-            await Task.Delay(rand.Next(4000, 10000));
+            await Task.Delay(rand.Next(500, 1500));
             Console.WriteLine($"{flight.FlightId} timer finished");
             flight.TimerFinished = true;
             ContextFunctionsLock(4, flight);
