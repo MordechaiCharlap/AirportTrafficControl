@@ -78,7 +78,7 @@ namespace AirportTrafficControlTower.Client.Controllers
                 var result = res.Content.ReadAsStringAsync().Result;
                 stationList = JsonConvert.DeserializeObject<List<Station>>(result)!;
             }
-            return Json(new { data = stationList });
+            return Json(new { stationList = stationList });
         }
         public async Task<IActionResult> GetAllStationsStatus()
         {

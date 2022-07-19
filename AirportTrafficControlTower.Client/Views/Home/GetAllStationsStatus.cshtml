@@ -2,21 +2,32 @@
 <script type="text/javascript">
     $(document).ready(function(){
         $('.occupyLine').html("test1");
-        //setInterval(function(){
+        setInterval(function(){
             $.ajax({
                 type: 'Get',
                 url: '@Url.Action("LoadStations")',
                 dataType: 'json',
                 contentType: "application/json;charset=utf-8",
-                success: function(data) {
-                    console.log(data);
+                success: function(response) {
+                    $.each(response.stationList, function(index, station){
+                        console.log(station.occupiedBy);
+                        console.log(index);
+                        $(".occupyLine:eq("+index+")").html(station.occupiedBy);
+                    });
+
+
+
+                    //console.log(response);
+                    //console.log(response.stationList);
+                    //console.log(response.stationList[3]);
+                    //console.log(response.stationList[3].occupiedBy);
                 },
                 error: function(response) {
                     debugger;
                     alert('error');
                 }
             });
-        //}, 5000);
+        }, 5000);
     });
 
 </script>
