@@ -5,7 +5,36 @@
 }
 <script type="text/javascript">
     $(document).ready(function(){
+        $("#addAsc").click(function () {
+                 $.ajax({
+                     url: '@Url.Action("AddNewFlight")',
+                     type: 'POST',
+                     dataType: 'json',
+                     data: {"isAsc": true},
+                     success: function (data, textStatus, xhr) {
+                         console.log("success");
+                     },
+                     error: function (xhr, textStatus, errorThrown) {
+                         console.log('Error in Operation');
+                     }
+                 });
+             });
+             $("#addDesc").click(function () {
+                 $.ajax({
+                     url: '@Url.Action("AddNewFlight")',
+                     type: 'POST',
+                     dataType: 'json',
+                     data: {"isAsc": false},
+                     success: function (data, textStatus, xhr) {
+                         console.log("success");
+                     },
+                     error: function (xhr, textStatus, errorThrown) {
+                         console.log('Error in Operation');
+                     }
+                 });
+             });
         setInterval(function(){
+
             $.ajax({
                 type: 'Get',
                 url: '@Url.Action("LoadStations")',
@@ -16,15 +45,18 @@
                         $(".flightInStation:eq("+index+")").html(stationStatus.flightInStation);
                         $(".stationBody i:eq("+index+")").removeClass('fa-plane-circle-xmark').
                             removeClass('fa-plane-departure').
-                            removeClass('fa-fa-plane-arrival');
+                            removeClass('fa-plane-arrival');
+                            $(".station .card-header:eq("+index+")").css("background-color", "green");
                         if(stationStatus.isAscending==null){
                             $(".stationBody i:eq("+index+")").addClass('fa-plane-circle-xmark');
                         }
                         else if(stationStatus.isAscending){
                             $(".stationBody i:eq("+index+")").addClass('fa-plane-departure');
+                            $(".station .card-header:eq("+index+")").css("background-color", "red");
                         }
                         else{
                             $(".stationBody i:eq("+index+")").addClass('fa-plane-arrival');
+                            $(".station .card-header:eq("+index+")").css("background-color", "red");
                         }
                     });
                 },
@@ -33,16 +65,20 @@
                     alert('error');
                 }
             });
-        }, 1000);
+        }, 500);
     });
 
 </script>
 
 <p>
-    <a class="btn btn-sm btn-outline-secondary" asp-action="AddFlight">Add Flight</a>
+     <a id="addAsc" class="btn btn-sm btn-outline-secondary">Add Ascending Flight</a>
+        <a id="addDesc" class="btn btn-sm btn-outline-secondary">Add Descending Flight</a>
+
+  @*  <a class="btn btn-sm btn-outline-secondary" asp-action="AddNewFlight" asp-route-isAsc="@true">Add Ascending Flight</a>
+    <a class="btn btn-sm btn-outline-secondary" asp-action="AddNewFlight" asp-route-isAsc="@false">Add Descending Flight</a>*@
 </p>
 <div class="d-flex justify-content-center">
-    <div class="d-flex flex-wrap justify-content-between col-lg-8 col-md-12 col-xl-8">
+    <div class="d-flex flex-wrap justify-content-between col-lg-8 col-md-12">
         @foreach (var item in Model)
         {
             var className = "bi bi-" + @item.StationNumber + "-square-fill";
@@ -51,7 +87,7 @@
                     <i class="@className"></i>
                 </div>
                 <div class="card-body stationBody d-flex">
-                    <p class="card-text flightInStation">None</p>
+                    <p class="card-text flightInStation"></p>
                     <i class="fa-solid fa-plane-circle-xmark"></i>
                 </div>
             </div>

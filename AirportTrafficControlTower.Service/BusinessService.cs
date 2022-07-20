@@ -75,19 +75,29 @@ namespace AirportTrafficControlTower.Service
             await Task.WhenAll(list);
         }
         public async Task AddNewFlight(CreateFlightDto flightDto)
+
         {
-            List<Task> list = new();
-            for(int i = 0; i < 10; i++)
+            Task task = null;
+            var newFlight = _mapper.Map<Flight>(flightDto);
+            ContextFunctionsLock(2, newFlight);
+            _flightsCollection.Add(newFlight);
+            if (newFlight == _flightsCollection.First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending))
             {
-                var newFlight = _mapper.Map<Flight>(flightDto);
-                ContextFunctionsLock(2, newFlight);
-                _flightsCollection.Add(newFlight);
-                if (newFlight == _flightsCollection.First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending))
-                {
-                    list.Add(MoveNextIfPossible(newFlight));
-                }
+                 task = MoveNextIfPossible(newFlight);
             }
-            await Task.WhenAll(list);
+            if(task!=null) await task;
+            //List<Task> list = new();
+            //for(int i = 0; i < 10; i++)
+            //{
+            //    var newFlight = _mapper.Map<Flight>(flightDto);
+            //    ContextFunctionsLock(2, newFlight);
+            //    _flightsCollection.Add(newFlight);
+            //    if (newFlight == _flightsCollection.First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending))
+            //    {
+            //        list.Add(MoveNextIfPossible(newFlight));
+            //    }
+            //}
+            //await Task.WhenAll(list);
         }
 
         public List<GetFlightDto> GetAllFlights()
@@ -295,7 +305,7 @@ namespace AirportTrafficControlTower.Service
             ContextFunctionsLock(4, flight);
             Console.WriteLine($"{flight.FlightId} timer started");
             var rand = new Random();
-            await Task.Delay(rand.Next(500, 1500));
+            await Task.Delay(rand.Next(1000, 3000));
             Console.WriteLine($"{flight.FlightId} timer finished");
             flight.TimerFinished = true;
             ContextFunctionsLock(4, flight);

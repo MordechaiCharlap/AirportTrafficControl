@@ -14,20 +14,17 @@ namespace AirportTrafficControlTower.Manager.Controllers
     public class AirportController : ControllerBase
     {
         private readonly IBusinessService _businessService;
-        private bool _isWorking = false;
         public AirportController(IBusinessService businessService)
         {
             _businessService = businessService;
+
         }
         [Route("[action]", Name = "StartApp")]
-        [HttpPost]
+        [HttpGet]
         public async Task StartApp()
         {
-            if (!_isWorking)
-            {
-                _isWorking = true;
-                await _businessService.StartApp();
-            }
+            await  _businessService.StartApp();
+            //var addFlight = BackgroundJob.Enqueue(()=>_businessService.StartApp());
         }
         [Route("[action]/{isAsc:bool}", Name = "GetPendingFlightsByAsc")]
         [HttpGet]
@@ -51,6 +48,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
         public async Task<List<Station>> GetAllStationsStatus()
         {
             return await _businessService.GetAllStationsStatus();
+
         }
 
         [Route("[action]", Name = "GetStationsStatusList")]
