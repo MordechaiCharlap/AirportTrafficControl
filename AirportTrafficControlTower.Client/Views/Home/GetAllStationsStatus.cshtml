@@ -1,4 +1,4 @@
-﻿@model IEnumerable<AirportTrafficControlTower.Data.Model.Station>
+﻿@model IEnumerable<AirportTrafficControlTower.Data.Model.StationStatus>
 <link rel="stylesheet" href="~/css/stationStatus.css" asp-append-version="true" />
 @{
     ViewData["Title"] = "GetAllStationsStatus";
@@ -12,9 +12,20 @@
                 dataType: 'json',
                 contentType: "application/json;charset=utf-8",
                 success: function(response) {
-                    $.each(response.stationList, function(index, station){
-                            $(".flightInStation:eq("+index+")").html(station.occupiedBy);
-
+                    $.each(response.stationStatusList, function(index, stationStatus){
+                        $(".flightInStation:eq("+index+")").html(stationStatus.flightInStation);
+                        $(".stationBody i:eq("+index+")").removeClass('fa-plane-circle-xmark').
+                            removeClass('fa-plane-departure').
+                            removeClass('fa-fa-plane-arrival');
+                        if(stationStatus.isAscending==null){
+                            $(".stationBody i:eq("+index+")").addClass('fa-plane-circle-xmark');
+                        }
+                        else if(stationStatus.isAscending){
+                            $(".stationBody i:eq("+index+")").addClass('fa-plane-departure');
+                        }
+                        else{
+                            $(".stationBody i:eq("+index+")").addClass('fa-plane-arrival');
+                        }
                     });
                 },
                 error: function(response) {
@@ -31,48 +42,20 @@
     <a class="btn btn-sm btn-outline-secondary" asp-action="AddFlight">Add Flight</a>
 </p>
 <div class="d-flex justify-content-center">
-    <div class="d-flex flex-wrap justify-content-between col-8">
+    <div class="d-flex flex-wrap justify-content-between col-lg-8 col-md-12 col-xl-8">
         @foreach (var item in Model)
         {
             var className = "bi bi-" + @item.StationNumber + "-square-fill";
-            var flight = @item.OccupiedBy;
             <div class="card station">
                 <div class="card-header d-flex justify-content-center">
-                    @*<i class="bi bi-1-square-fill"></i>*@
                     <i class="@className"></i>
                 </div>
-                <div class="card-body">
-                    <p class="card-text">Flight in station:</p>
-                    <p class="card-text flightInStation">@flight</p>
+                <div class="card-body stationBody d-flex">
+                    <p class="card-text flightInStation">None</p>
+                    <i class="fa-solid fa-plane-circle-xmark"></i>
                 </div>
             </div>
         }
     </div>
 </div>
 
-<table class="table">
-    <thead>
-        <tr>
-            <th>
-                @Html.DisplayNameFor(model => model.StationNumber)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.OccupiedBy)
-            </th>
-            <th></th>
-        </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model)
-        {
-            <tr class="tableLine">
-                <td>
-                    @Html.DisplayFor(modelItem => item.StationNumber)
-                </td>
-                <td class="occupyLine">
-                    @Html.DisplayFor(modelItem => item.OccupiedBy)
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>

@@ -11,6 +11,7 @@ namespace AirportTrafficControlTower.Service.Interfaces
     public interface IBusinessService
     {
         Task<List<Station>> GetAllStationsStatus();
+        List<StationStatus> GetStationsStatusList();
         List<GetFlightDto> GetAllFlights();
         Task AddNewFlight(CreateFlightDto flight);
         Task StartApp();

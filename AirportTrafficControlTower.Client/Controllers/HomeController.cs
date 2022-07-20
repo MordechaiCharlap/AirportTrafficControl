@@ -70,25 +70,26 @@ namespace AirportTrafficControlTower.Client.Controllers
         }
         public async Task<JsonResult> LoadStations()
         {
-            List<Station> stationList = new();
+            List<StationStatus> stationStatusList = new();
             HttpClient client = _api.Initial();
-            HttpResponseMessage res = await client.GetAsync($"api/Airport/GetAllStationsStatus");
+            HttpResponseMessage res = await client.GetAsync($"api/Airport/GetStationsStatusList");
             if (res.IsSuccessStatusCode)
             {
                 var result = res.Content.ReadAsStringAsync().Result;
-                stationList = JsonConvert.DeserializeObject<List<Station>>(result)!;
+                stationStatusList = JsonConvert.DeserializeObject<List<StationStatus>>(result)!;
             }
-            return Json(new { stationList = stationList });
+            
+            return Json(new { stationStatusList = stationStatusList });
         }
         public async Task<IActionResult> GetAllStationsStatus()
         {
-            List<Station> stationList = new();
+            List<StationStatus> stationList = new();
             HttpClient client = _api.Initial();
             HttpResponseMessage res = await client.GetAsync($"api/Airport/GetAllStationsStatus");
             if (res.IsSuccessStatusCode)
             {
                 var result = res.Content.ReadAsStringAsync().Result;
-                stationList = JsonConvert.DeserializeObject<List<Station>>(result)!;
+                stationList = JsonConvert.DeserializeObject<List<StationStatus>>(result)!;
             }
             return View(stationList);
         }

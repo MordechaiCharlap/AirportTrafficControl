@@ -36,6 +36,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
             var list = await _businessService.GetPendingFlightsByAsc(isAsc);
             return list;
         }
+
         [Route("[action]", Name = "GetAllFlights")]
         [HttpGet]
         public  List<GetFlightDto> GetAllFlights()
@@ -44,12 +45,21 @@ namespace AirportTrafficControlTower.Manager.Controllers
             //return null;
             return _businessService.GetAllFlights();
         }
+
         [Route("[action]", Name = "GetAllStationsStatus")]
         [HttpGet]
         public async Task<List<Station>> GetAllStationsStatus()
         {
             return await _businessService.GetAllStationsStatus();
         }
+
+        [Route("[action]", Name = "GetStationsStatusList")]
+        [HttpGet]
+        public List<StationStatus> GetStationsStatusList()
+        {
+            return _businessService.GetStationsStatusList();
+        }
+
         [Route("[action]", Name = "SeeAllLiveUpdates")]
         [HttpGet]
         public async Task<List<LiveUpdate>> GetAllLiveUpdates()

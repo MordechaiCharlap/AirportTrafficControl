@@ -48,6 +48,24 @@ namespace AirportTrafficControlTower.Service
                 FirstOrDefaultAsync(station => station.OccupiedBy == flightId);
         }
 
+        public List<StationStatus> GetStationsStatusList()
+        {
+            List<StationStatus> list = new();
+            _stationRepository.GetAll().Include(station => station.OccupiedByNavigation).
+                ToList().
+                ForEach(station =>
+                {
+                    bool? isAsc = station.OccupiedByNavigation != null ? station.OccupiedByNavigation.IsAscending : null;
+                    list.Add(new StationStatus()
+                    {
+                        StationNumber = station.StationNumber,
+                        FlightInStation = station.OccupiedBy,
+                        IsAscending=isAsc
+                    });
+                });
+            return list;
+        }
+
         public bool Update(Station entity)
         {
                 return _stationRepository.Update(entity);

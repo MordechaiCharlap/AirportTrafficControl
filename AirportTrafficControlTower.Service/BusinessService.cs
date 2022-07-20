@@ -88,13 +88,6 @@ namespace AirportTrafficControlTower.Service
                 }
             }
             await Task.WhenAll(list);
-            //var newFlight = _mapper.Map<Flight>(flightDto);
-            //ContextFunctionsLock(2, newFlight);
-            //_flightsCollection.Add(newFlight);
-            //var addFlight = BackgroundJob.Enqueue(() => MoveNextIfPossible(newFlight));
-            //if (newFlight == _flightsCollection.First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending))
-            //await MoveNextIfPossible(newFlight);
-            //Console.WriteLine($"asc = {newFlight.IsAscending} pend = {newFlight.IsPending} flightId = {newFlight.FlightId}");
         }
 
         public List<GetFlightDto> GetAllFlights()
@@ -375,6 +368,11 @@ namespace AirportTrafficControlTower.Service
         public async Task<List<LiveUpdate>> GetAllLiveUpdates()
         {
             return await _liveUpdateService.GetAll();
+        }
+
+        public List<StationStatus> GetStationsStatusList()
+        {
+            return _stationService.GetStationsStatusList();
         }
     }
 }
