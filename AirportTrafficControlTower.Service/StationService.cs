@@ -22,9 +22,10 @@ namespace AirportTrafficControlTower.Service
 
         public void ChangeOccupyBy(int stationNumber, int? flightId)
         {
-            var station = _stationRepository.GetById(stationNumber);
-            station!.OccupiedBy=flightId;
-            _stationRepository.Update(station);
+            Station station = new() { StationNumber = stationNumber, OccupiedBy = flightId };
+            //var station = _stationRepository.GetById(stationNumber);
+            //station!.OccupiedBy=flightId;
+            if (_stationRepository.Update(station)) Console.WriteLine($"Station {station.StationNumber} updated!");
         }
 
         public bool CircleOfDoomIsFull()
@@ -75,6 +76,11 @@ namespace AirportTrafficControlTower.Service
                     });
                 });
             return list;
+        }
+
+        public async Task SaveChangesAsync()
+        {
+            await _stationRepository.SaveChangesAsync();
         }
 
         public bool Update(Station entity)

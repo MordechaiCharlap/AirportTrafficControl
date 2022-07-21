@@ -98,6 +98,7 @@ namespace AirportTrafficControlTower.Service
             Console.WriteLine($"Flight {flight.FlightId} is trying to move next");
             Station? nextStation = null;
             var currentStation = _stationService.GetAll().FirstOrDefault(station => station.OccupiedBy == flight.FlightId);
+            if(currentStation!=null) _stationService.Update(currentStation);
             int? currentStationNumber = currentStation?.StationNumber;
             var nextRoutes = _routeService.GetRoutesByCurrentStationAndAsc(currentStationNumber, flight.IsAscending);
             var success = false;
@@ -124,8 +125,8 @@ namespace AirportTrafficControlTower.Service
                                 Console.WriteLine($"success = {nextStation.StationNumber} is empty");
 
                                 success = true;
-                                //_stationService.ChangeOccupyBy(nextStation.StationNumber, flight.FlightId);
-                                ChangeOccupation(nextStation.StationNumber, flight.FlightId);
+                                _stationService.ChangeOccupyBy(nextStation.StationNumber, flight.FlightId);
+                                //OccupyStation(nextStation.StationNumber, null);
                                 Console.WriteLine($"Station {nextStation.StationNumber} is now filled by {flight.FlightId}");
                             }
                             else
@@ -137,7 +138,7 @@ namespace AirportTrafficControlTower.Service
             }
             else
             {
-                Console.WriteLine("circle of doom");
+                Console.WriteLine("circle of doom**************************************");
             }
             
             if (success)
@@ -152,7 +153,7 @@ namespace AirportTrafficControlTower.Service
                 }
                 else
                 {
-
+                    if (currentStation == null) Console.WriteLine($"Flight {flight.FlightId} should be in a station but isnt ***********************");
                     LiveUpdate leavingUpdate = new() { FlightId = flight.FlightId, IsEntering = false, StationId = currentStation!.StationNumber, UpdateTime = DateTime.Now };
                     _liveUpdateService.Create(leavingUpdate);
                     Console.WriteLine($"Flight {flight.FlightId} left station {currentStation!.StationNumber}");
@@ -172,89 +173,36 @@ namespace AirportTrafficControlTower.Service
                 }
                 if (currentStation != null)
                 {
-                    //_stationService.ChangeOccupyBy(currentStation.StationNumber, null);
-                    ChangeOccupation(currentStation.StationNumber, null);
+                    _stationService.ChangeOccupyBy(currentStation.StationNumber, null);
+                    //OccupyStation(currentStation.StationNumber, null);
                     Console.WriteLine($"{currentStation.StationNumber} is now available, trying to find new flight to get in");
-                    await SendWaitingInLineFlightIfPossible(currentStation);
+                    await SendWaitingInLineFlightIfPossible(_stationService.Get(currentStation.StationNumber)!);
                 }
 
             }
             else
                 Console.WriteLine($"Flight {flight.FlightId} hasnt managed to move next");
             if (task != null) await task;
-
         }
-        private void ChangeOccupation(int stationNumber, int? flightId)
+        void OccupyStation(int stationNumber, int? flightId)
         {
             lock (obj)
             {
-            _stationService.ChangeOccupyBy(stationNumber, flightId);
-
+                _stationService.ChangeOccupyBy(stationNumber, flightId);
             }
         }
-        private void SaveNewLiveUpdate(LiveUpdate update)
-        {
-            using (var _context = new AirPortTrafficControlContext())
-            {
-                _context.LiveUpdates.Add(update);
-                _context.SaveChanges();
-            }
-
-
-        }
-        private void SaveNewFlight(Flight flight)
-        {
-            using (var _context = new AirPortTrafficControlContext())
-            {
-                flight.IsPending = true;
-                flight.IsDone = false;
-                flight.SubmissionTime = DateTime.Now;
-                _context.Flights.Add(flight);
-                _context.SaveChanges();
-            }
-
-        }
-        private void UpdateStation(Station station)
-        {
-            using (var _context = new AirPortTrafficControlContext())
-            {
-                _context.Stations.Update(station);
-                _context.SaveChanges();
-            }
-
-
-        }
-        private void UpdateFlight(Flight flight)
-        {
-            using (var _context = new AirPortTrafficControlContext())
-            {
-                _context.Flights.Update(flight);
-                _context.SaveChanges();
-            }
-
-        }
-
         private async Task SendWaitingInLineFlightIfPossible(Station currentStation)
         {
-            var sourcesStations = GetPointingStations(currentStation);
-            bool? isFirstAscendingStation = IsFirstAscendingStation(currentStation);
+            var sourcesStations = _routeService.GetPointingStations(currentStation);
+            bool? isFirstAscendingStation = _routeService.IsFirstAscendingStation(currentStation);
             Flight? selectedFlight;
             selectedFlight = _flightService.GetFirstFlightInQueue(sourcesStations, isFirstAscendingStation);
             if (selectedFlight != null)
             {
                 Console.WriteLine($"Sending Flight {selectedFlight.FlightId} to try moving next (must work)");
-                await MoveNextIfPossible(selectedFlight);
+                await _stationService.SaveChangesAsync();
+                await MoveNextIfPossible(_flightService.Get(selectedFlight.FlightId)!);
             }
-        }
-        private List<Station> GetPointingStations(Station station)
-        {
-            ;
-            return _routeService.GetPointingStations(station);
-        }
-        private bool? IsFirstAscendingStation(Station currentStation)
-        {
-            var waitingRoute = _routeService.GetAll().FirstOrDefault(route => route.Destination == currentStation.StationNumber && route.Source == null);
-            return waitingRoute == null ? null : waitingRoute.IsAscending;
         }
 
         public async Task StartTime(Flight flight)

@@ -55,7 +55,7 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public async Task SaveChangesAsync()
         {
-            //var _context = GetContext();
+            var _context = GetContext();
             await _context.SaveChangesAsync();
         }
 
