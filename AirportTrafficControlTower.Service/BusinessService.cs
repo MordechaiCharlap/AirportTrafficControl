@@ -67,7 +67,7 @@ namespace AirportTrafficControlTower.Service
         public async Task AddNewFlight(CreateFlightDto flightDto)
         {
             var newFlight = _mapper.Map<Flight>(flightDto);
-            await _flightService.Create(newFlight);
+            _flightService.Create(newFlight);
             Task task = null;
             if (newFlight.FlightId == _flightService.GetAll().First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending).FlightId)
             {
@@ -112,7 +112,7 @@ namespace AirportTrafficControlTower.Service
                             success = true;
                             flight.IsDone = true;
                             _flightService.Update(flight);
-                            Console.WriteLine($"Flight {flight.FlightId} is done");
+                            Console.WriteLine($"success = Flight {flight.FlightId} is done");
                         }
                         else
                         {
@@ -121,10 +121,11 @@ namespace AirportTrafficControlTower.Service
 
                             if (nextStation.OccupiedBy == null)
                             {
-                                Console.WriteLine($"{nextStation.StationNumber} is empty");
+                                Console.WriteLine($"success = {nextStation.StationNumber} is empty");
 
                                 success = true;
-                                _stationService.ChangeOccupyBy(nextStation.StationNumber, flight.FlightId);
+                                //_stationService.ChangeOccupyBy(nextStation.StationNumber, flight.FlightId);
+                                ChangeOccupation(nextStation.StationNumber, flight.FlightId);
                                 Console.WriteLine($"Station {nextStation.StationNumber} is now filled by {flight.FlightId}");
                             }
                             else
@@ -133,6 +134,10 @@ namespace AirportTrafficControlTower.Service
 
                     }
                 }
+            }
+            else
+            {
+                Console.WriteLine("circle of doom");
             }
             
             if (success)
@@ -149,13 +154,13 @@ namespace AirportTrafficControlTower.Service
                 {
 
                     LiveUpdate leavingUpdate = new() { FlightId = flight.FlightId, IsEntering = false, StationId = currentStation!.StationNumber, UpdateTime = DateTime.Now };
-                    await _liveUpdateService.Create(leavingUpdate);
+                    _liveUpdateService.Create(leavingUpdate);
                     Console.WriteLine($"Flight {flight.FlightId} left station {currentStation!.StationNumber}");
                 }
                 if (!flight.IsDone)
                 {
                     LiveUpdate enteringUpdate = new() { FlightId = flight.FlightId, IsEntering = true, StationId = nextStation!.StationNumber, UpdateTime = DateTime.Now };
-                    await _liveUpdateService.Create(enteringUpdate);
+                    _liveUpdateService.Create(enteringUpdate);
                     Console.WriteLine($"Flight {flight.FlightId} enters station {nextStation!.StationNumber}, station {nextStation.StationNumber} is occupied by {nextStation.OccupiedBy}");
                     task = StartTime(flight);
                 }
@@ -167,7 +172,8 @@ namespace AirportTrafficControlTower.Service
                 }
                 if (currentStation != null)
                 {
-                    _stationService.ChangeOccupyBy(currentStation.StationNumber, null);
+                    //_stationService.ChangeOccupyBy(currentStation.StationNumber, null);
+                    ChangeOccupation(currentStation.StationNumber, null);
                     Console.WriteLine($"{currentStation.StationNumber} is now available, trying to find new flight to get in");
                     await SendWaitingInLineFlightIfPossible(currentStation);
                 }
@@ -178,16 +184,14 @@ namespace AirportTrafficControlTower.Service
             if (task != null) await task;
 
         }
+        private void ChangeOccupation(int stationNumber, int? flightId)
+        {
+            lock (obj)
+            {
+            _stationService.ChangeOccupyBy(stationNumber, flightId);
 
-        //}
-        //private void UpdateCollections()
-        //{
-        //        using (var _context = new AirPortTrafficControlContext())
-        //        {
-        //        _stationsCollection = _context.Stations.ToList();
-        //        _flightsCollection = _context.Flights.ToList();
-        //        }
-        //}
+            }
+        }
         private void SaveNewLiveUpdate(LiveUpdate update)
         {
             using (var _context = new AirPortTrafficControlContext())

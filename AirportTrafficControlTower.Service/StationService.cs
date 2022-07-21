@@ -24,7 +24,7 @@ namespace AirportTrafficControlTower.Service
         {
             var station = _stationRepository.GetById(stationNumber);
             station!.OccupiedBy=flightId;
-            var isTrue = _stationRepository.Update(station);
+            _stationRepository.Update(station);
         }
 
         public bool CircleOfDoomIsFull()
@@ -38,7 +38,7 @@ namespace AirportTrafficControlTower.Service
             return false;
         }
 
-        public Task Create(Station entity)
+        public void Create(Station entity)
         {
             throw new NotImplementedException();
         }

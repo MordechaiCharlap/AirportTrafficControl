@@ -19,6 +19,7 @@ namespace AirportTrafficControlTower.Data.Repositories
         public void Create(LiveUpdate entity)
         {
             _context.Add(entity);
+            _context.SaveChanges();
         }
 
         public bool Delete(int id)

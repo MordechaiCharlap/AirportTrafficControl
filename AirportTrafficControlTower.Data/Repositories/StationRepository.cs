@@ -62,14 +62,9 @@ namespace AirportTrafficControlTower.Data.Repositories
         public bool Update(Station entity)
         {
             var _context = GetContext();
-            var station = GetById(entity.StationNumber);
-            if (station == null) return false;
-            else
-            {
                 _context.Stations.Update(entity);
                 _context.SaveChanges();
                 return true;
-            }
 
         }
         public void SaveChanges()

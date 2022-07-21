@@ -17,10 +17,10 @@ namespace AirportTrafficControlTower.Service
         {
             _liveUpdateRepository = liveUpdateRepository;
         }
-        public async Task Create(LiveUpdate entity)
+        public void Create(LiveUpdate entity)
         {
             _liveUpdateRepository.Create(entity);
-            await _liveUpdateRepository.SaveChangesAsync();
+            _liveUpdateRepository.SaveChanges();
         }
 
         public LiveUpdate? Get(int id)

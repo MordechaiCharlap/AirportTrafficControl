@@ -20,13 +20,12 @@ namespace AirportTrafficControlTower.Service
             _flightRepostory = flightRepository;
         }
 
-        public async Task Create(Flight flight)
+        public void Create(Flight flight)
         {
             flight.IsPending = true;
             flight.IsDone = false;
             flight.SubmissionTime = DateTime.Now;
             _flightRepostory.Create(flight);
-            await _flightRepostory.SaveChangesAsync();
         }
 
         public Flight? Get(int id)

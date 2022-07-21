@@ -18,10 +18,10 @@ namespace AirportTrafficControlTower.Service
             _routeRepository = routeRepository;
         }
 
-        public async Task Create(Route entity)
+        public void Create(Route entity)
         {
             _routeRepository.Create(entity);
-            await _routeRepository.SaveChangesAsync();
+            _routeRepository.SaveChanges();
         }
 
         public Route? Get(int id)

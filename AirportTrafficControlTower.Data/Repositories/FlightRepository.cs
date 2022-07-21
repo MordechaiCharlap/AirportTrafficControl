@@ -23,7 +23,8 @@ namespace AirportTrafficControlTower.Data.Repositories
         public void Create(Flight entity)
         {
             var _context = GetContext();
-            _context.Add(entity);
+            _context.Flights.Add(entity);
+            _context.SaveChanges();
         }
         public bool Delete(int id)
         {
@@ -69,6 +70,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             else
             {
                 _context.Update(entity);
+                _context.SaveChanges();
                 return true;
             }
         }
