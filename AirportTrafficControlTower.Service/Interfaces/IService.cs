@@ -9,7 +9,7 @@ namespace AirportTrafficControlTower.Service.Interfaces
     public interface IService<T> where T:class
     {
         Task Create(T entity);
-        Task<List<T>> GetAll();
+        List<T> GetAll();
         T? Get(int id);
         bool Update (T entity);
     }

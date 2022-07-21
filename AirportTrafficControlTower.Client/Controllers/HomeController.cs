@@ -13,16 +13,12 @@ namespace AirportTrafficControlTower.Client.Controllers
     public class HomeController : Controller
     {
         AirportApi _api = new AirportApi();
+        HttpClient client;
         bool isWorking = false;
         public HomeController()
         {
-            //if (!isWorking)
-            //{
-            //    StartApp();
-            //    isWorking = true;
-            //}
+            client = _api.Initial();
         }
-
         public IActionResult Index()
         {
             return View();
@@ -33,14 +29,12 @@ namespace AirportTrafficControlTower.Client.Controllers
         }
         public IActionResult AddNewFlight(bool isAsc)
         {
-            using (HttpClient client = _api.Initial())
-            {
-                CreateFlightDto newDto = new() { IsAscending = isAsc };
-                string uri = "api/Airport/AddNewFlight";
-                var newDtoJason = JsonConvert.SerializeObject(newDto);
-                var payload = new StringContent(newDtoJason, Encoding.UTF8, "application/json");
-                var res = client.PostAsync(uri, payload).Result.Content.ReadAsStringAsync().Result;
-            }
+
+            CreateFlightDto newDto = new() { IsAscending = isAsc };
+            string uri = "api/Airport/AddNewFlight";
+            var newDtoJason = JsonConvert.SerializeObject(newDto);
+            var payload = new StringContent(newDtoJason, Encoding.UTF8, "application/json");
+            var res = client.PostAsync(uri, payload).Result.Content.ReadAsStringAsync().Result;
             return RedirectToAction("GetAllStationsStatus");
 
         }
@@ -86,6 +80,11 @@ namespace AirportTrafficControlTower.Client.Controllers
             List<StationStatus> stationStatusList = new();
             using (HttpClient client = _api.Initial())
             {
+                if (!isWorking)
+                {
+                    await client.GetAsync($"api/Airport/StartApp");
+                    isWorking = true;
+                }
                 HttpResponseMessage res = await client.GetAsync($"api/Airport/GetStationsStatusList");
                 if (res.IsSuccessStatusCode)
                 {

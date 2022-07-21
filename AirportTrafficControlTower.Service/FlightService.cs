@@ -14,6 +14,7 @@ namespace AirportTrafficControlTower.Service
     public class FlightService : IFlightService
     {
         private readonly IRepository<Flight> _flightRepostory;
+
         public FlightService(IRepository<Flight> flightRepository)
         {
             _flightRepostory = flightRepository;
@@ -33,11 +34,11 @@ namespace AirportTrafficControlTower.Service
             return _flightRepostory.GetById(id);
         }
 
-        public async Task<List<Flight>> GetAll()
+        public List<Flight> GetAll()
         {
-            return await _flightRepostory.GetAll().ToListAsync();
+            return _flightRepostory.GetAll().ToList();
         }
-        public async Task<Flight?> GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation)
+        public Flight? GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation)
         {
             Flight? selectedFlight = null;
             foreach (var pointingStation in pointingStations)
@@ -45,13 +46,17 @@ namespace AirportTrafficControlTower.Service
                 var flightId = pointingStation.OccupiedBy;
                 if (flightId != null)
                 {
-                    Flight flightToCheck = Get((int)flightId);
+                    Flight flightToCheck = _flightRepostory.GetAll().Include(flight => flight.Stations).First(flight => flight.FlightId == (int)flightId);
                     if (flightToCheck!.TimerFinished == true)
                     {
                         if (selectedFlight == null) selectedFlight = flightToCheck;
                         else
                         {
-                            if (selectedFlight.SubmissionTime >= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
+                            if (flightToCheck.Stations.FirstOrDefault(station => station.StationNumber == 3) != null)
+                            {
+                                if (selectedFlight.SubmissionTime >= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
+                            }
+                                
                         }
                     }
                 }
@@ -60,18 +65,33 @@ namespace AirportTrafficControlTower.Service
 
             if (isFirstAscendingStation != null)
             {
-
-                var pendingFirstFlight = _flightRepostory.GetAll().FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation&&flight.IsPending==true);
-                if (pendingFirstFlight!=null)
+                Console.WriteLine("Trying to find a plane in the list to start the route");
+                var pendingFirstFlight = _flightRepostory.GetAll().FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation && flight.IsPending == true);
+                if (pendingFirstFlight != null)
                 {
+                    Console.WriteLine("Found a flight in the list");
                     if (selectedFlight == null) selectedFlight = pendingFirstFlight;
-                    else
-                    {
-                        if (selectedFlight.SubmissionTime >= pendingFirstFlight.SubmissionTime) selectedFlight = pendingFirstFlight;
-                    }
+                    //else
+                    //{
+                        
+                    //    if (selectedFlight.SubmissionTime >= pendingFirstFlight.SubmissionTime) selectedFlight = pendingFirstFlight;
+                    //}
+                }
+                else
+                {
+                    Console.WriteLine("Have Not Found a flight in the list");
                 }
             }
-            return selectedFlight;
+            if (selectedFlight == null)
+            {
+                Console.WriteLine("No flight is waiting");
+                return null;
+            }
+            else
+            {
+                Console.WriteLine($"{selectedFlight.FlightId} is the first line in queue");
+                return selectedFlight;
+            }
         }
 
         public bool Update(Flight entity)

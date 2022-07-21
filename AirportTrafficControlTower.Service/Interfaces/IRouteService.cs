@@ -12,5 +12,6 @@ namespace AirportTrafficControlTower.Service.Interfaces
         List<Station> GetPointingStations(Station station);
         bool? IsFirstAscendingStation(Station currentStation);
         List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending);
+        bool IsCircleOfDoom(List<Route> nextRoutes);
     }
 }

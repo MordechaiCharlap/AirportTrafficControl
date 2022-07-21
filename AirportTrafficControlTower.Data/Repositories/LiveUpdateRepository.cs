@@ -34,12 +34,18 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public IQueryable<LiveUpdate> GetAll()
         {
+            var _context = new AirPortTrafficControlContext();
             return _context.LiveUpdates;
         }
 
         public LiveUpdate? GetById(int id)
         {
             return _context.LiveUpdates.Find(id);
+        }
+
+        public void SaveChanges()
+        {
+            _context.SaveChanges();
         }
 
         public async Task SaveChangesAsync()
@@ -53,7 +59,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             if (update == null) return false;
             else
             {
-                _context.Update(update);
+                _context.Update(entity);
                 return true;
             }
         }

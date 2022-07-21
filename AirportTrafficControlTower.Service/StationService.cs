@@ -20,11 +20,22 @@ namespace AirportTrafficControlTower.Service
             _stationRepository = stationRepository;
         }
 
-        public async Task ChangeOccupyBy(int stationNumber, int? flightId)
+        public void ChangeOccupyBy(int stationNumber, int? flightId)
         {
             var station = _stationRepository.GetById(stationNumber);
             station!.OccupiedBy=flightId;
-            await _stationRepository.SaveChangesAsync();
+            var isTrue = _stationRepository.Update(station);
+        }
+
+        public bool CircleOfDoomIsFull()
+        {
+            int count = 0;
+            _stationRepository.GetAll().ToList().ForEach(station =>
+            {
+                if (station.StationNumber >= 4 && station.StationNumber <= 8 && station.OccupiedBy != null) count++;
+            });
+            if (count == 4) return true;
+            return false;
         }
 
         public Task Create(Station entity)
@@ -37,9 +48,9 @@ namespace AirportTrafficControlTower.Service
             return _stationRepository.GetById(id);
         }
 
-        public async Task<List<Station>> GetAll()
+        public List<Station> GetAll()
         {
-            return await _stationRepository.GetAll().ToListAsync();
+            return _stationRepository.GetAll().ToList();
         }
 
         public async Task<Station?> GetStationByFlightId(int flightId)

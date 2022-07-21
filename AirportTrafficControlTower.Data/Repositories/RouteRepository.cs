@@ -16,6 +16,11 @@ namespace AirportTrafficControlTower.Data.Repositories
         {
             _context = context;
         }
+        private AirPortTrafficControlContext GetContext()
+        {
+            AirPortTrafficControlContext _context = new();
+            return _context;
+        }
         public void Create(Route entity)
         {
             throw new NotImplementedException();
@@ -28,12 +33,19 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public IQueryable<Route> GetAll()
         {
+            var _context = GetContext();
             return _context.Routes;
         }
 
         public Route? GetById(int id)
         {
             throw new NotImplementedException();
+        }
+
+        public void SaveChanges()
+        {
+            //var _context = GetContext();
+            _context.SaveChanges();
         }
 
         public Task SaveChangesAsync()

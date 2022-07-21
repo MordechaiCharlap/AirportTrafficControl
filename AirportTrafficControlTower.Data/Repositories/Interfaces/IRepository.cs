@@ -8,5 +8,6 @@
         bool Update(T entity);
         void Create(T entity);
         Task SaveChangesAsync();
+        void SaveChanges();
     }
 }

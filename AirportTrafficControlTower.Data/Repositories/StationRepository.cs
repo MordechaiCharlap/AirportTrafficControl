@@ -17,17 +17,24 @@ namespace AirportTrafficControlTower.Data.Repositories
         {
             _context = context;
         }
+        private AirPortTrafficControlContext GetContext()
+        {
+            AirPortTrafficControlContext _context = new();
+            return _context;
+        }
         public void Create(Station entity)
         {
+            //var _context = GetContext();
             _context.Add(entity);
         }
 
         public bool Delete(int id)
         {
-            var station =GetById(id);
+            var station = GetById(id);
             if (station == null) return false;
             else
             {
+                //var _context = GetContext();
                 _context.Remove(station);
                 return true;
             }
@@ -35,28 +42,40 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public IQueryable<Station> GetAll()
         {
-            return _context.Stations;
+            var context = GetContext();
+            return context.Stations;
+
         }
 
         public Station? GetById(int id)
         {
+            //var _context = GetContext();
             return _context.Stations.Find(id);
         }
 
         public async Task SaveChangesAsync()
         {
+            //var _context = GetContext();
             await _context.SaveChangesAsync();
         }
 
         public bool Update(Station entity)
         {
+            var _context = GetContext();
             var station = GetById(entity.StationNumber);
             if (station == null) return false;
             else
             {
-                _context.Stations.Update(station);
+                _context.Stations.Update(entity);
+                _context.SaveChanges();
                 return true;
             }
+
+        }
+        public void SaveChanges()
+        {
+            //var _context = GetContext();
+            _context.SaveChanges();
         }
     }
 }

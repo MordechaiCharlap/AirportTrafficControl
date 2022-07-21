@@ -28,9 +28,9 @@ namespace AirportTrafficControlTower.Service
             return _liveUpdateRepository.GetById(id);
         }
 
-        public async Task<List<LiveUpdate>> GetAll()
+        public List<LiveUpdate> GetAll()
         {
-            return await _liveUpdateRepository.GetAll().ToListAsync();
+            return _liveUpdateRepository.GetAll().ToList();
         }
 
         public bool Update(LiveUpdate entity)

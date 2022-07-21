@@ -29,9 +29,9 @@ namespace AirportTrafficControlTower.Service
             return _routeRepository.GetById(id);
         }
 
-        public async Task<List<Route>> GetAll()
+        public List<Route> GetAll()
         {
-            return await _routeRepository.GetAll().ToListAsync();
+            return _routeRepository.GetAll().ToList();
         }
 
         public List<Station> GetPointingStations(Station station)
@@ -54,6 +54,13 @@ namespace AirportTrafficControlTower.Service
                       route.IsAscending == isAscending &&
                       (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null)).ToList();
             return list2;
+        }
+
+        public bool IsCircleOfDoom(List<Route> nextRoutes)
+        {
+            if (nextRoutes.FirstOrDefault(route => (route.Destination == 6 || route.Destination == 7) && route.IsAscending == true ||
+                 (route.Destination == 4 && route.IsAscending == false)) != null) return true;
+            return false;
         }
 
         public bool? IsFirstAscendingStation(Station currentStation)
