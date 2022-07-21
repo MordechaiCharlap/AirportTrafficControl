@@ -76,11 +76,6 @@ namespace AirportTrafficControlTower.Service
             return list;
         }
 
-        public async Task SaveChangesAsync()
-        {
-            await _stationRepository.SaveChangesAsync();
-        }
-
         public bool Update(Station entity)
         {
                 return _stationRepository.Update(entity);

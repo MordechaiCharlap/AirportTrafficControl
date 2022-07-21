@@ -14,6 +14,5 @@ namespace AirportTrafficControlTower.Service.Interfaces
         void ChangeOccupyBy(int stationNumber, int? flightId);
         List<StationStatus> GetStationsStatusList();
         bool CircleOfDoomIsFull();
-        Task SaveChangesAsync();
     }
 }

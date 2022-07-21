@@ -13,11 +13,10 @@ namespace AirportTrafficControlTower.Client.Controllers
     public class HomeController : Controller
     {
         AirportApi _api = new AirportApi();
-        HttpClient client;
         bool isWorking = false;
         public HomeController()
         {
-            client = _api.Initial();
+
         }
         public IActionResult Index()
         {
@@ -30,12 +29,16 @@ namespace AirportTrafficControlTower.Client.Controllers
         public IActionResult AddNewFlight(bool isAsc)
         {
 
-            CreateFlightDto newDto = new() { IsAscending = isAsc };
-            string uri = "api/Airport/AddNewFlight";
-            var newDtoJason = JsonConvert.SerializeObject(newDto);
-            var payload = new StringContent(newDtoJason, Encoding.UTF8, "application/json");
-            var res = client.PostAsync(uri, payload).Result.Content.ReadAsStringAsync().Result;
-            return RedirectToAction("GetAllStationsStatus");
+            using (var client = _api.Initial())
+            {
+                CreateFlightDto newDto = new() { IsAscending = isAsc };
+                string uri = "api/Airport/AddNewFlight";
+                var newDtoJason = JsonConvert.SerializeObject(newDto);
+                var payload = new StringContent(newDtoJason, Encoding.UTF8, "application/json");
+                var res = client.PostAsync(uri, payload).Result.Content.ReadAsStringAsync().Result;
+                return RedirectToAction("GetAllStationsStatus");
+            }
+
 
         }
         public async Task<IActionResult> SeeAllLiveUpdates(int pageNum = 1)
@@ -57,15 +60,16 @@ namespace AirportTrafficControlTower.Client.Controllers
             var startingIndex = (pageNum - 1) * elementsCountForPage;
             var count = Math.Min(elementsCountForPage, liveUpdates.Count - startingIndex);
             var pageList = liveUpdates.GetRange(startingIndex, count);
-            var lastPage = liveUpdates.Count / elementsCountForPage;
-            if (liveUpdates.Count % elementsCountForPage != 0)
+            var LastPageNum = liveUpdates.Count / elementsCountForPage;
+            //checking if there is a small page in the end or there is no updates at all
+            if (liveUpdates.Count % elementsCountForPage != 0||liveUpdates.Count==0)
             {
-                lastPage++;
+                LastPageNum++;
             }
             LiveUpdatesViewModel viewModel = new()
             {
                 IsFirstPage = (pageNum == 1),
-                IsLastPage = (pageNum == lastPage),
+                IsLastPage = (pageNum == LastPageNum),
                 LiveUpdatesList = pageList,
                 CurrentPage = pageNum
             };

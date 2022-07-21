@@ -183,13 +183,6 @@ namespace AirportTrafficControlTower.Service
                 Console.WriteLine($"Flight {flight.FlightId} hasnt managed to move next");
             if (task != null) await task;
         }
-        void OccupyStation(int stationNumber, int? flightId)
-        {
-            lock (obj)
-            {
-                _stationService.ChangeOccupyBy(stationNumber, flightId);
-            }
-        }
         private async Task SendWaitingInLineFlightIfPossible(Station currentStation)
         {
             var sourcesStations = _routeService.GetPointingStations(currentStation);
@@ -222,7 +215,6 @@ namespace AirportTrafficControlTower.Service
         public List<GetFlightDto> GetPendingFlightsByAsc(bool isAsc)
         {
             List<GetFlightDto> listDto = new();
-            //ContextFunctionsLock(5, new Flight());
 
             var list = _flightService.GetAll().Where(flight => flight.IsPending == true && flight.IsAscending == isAsc).ToList();
             list.ForEach(flight =>

@@ -73,11 +73,6 @@ namespace AirportTrafficControlTower.Service
                 {
                     Console.WriteLine("Found a flight in the list");
                     if (selectedFlight == null) selectedFlight = pendingFirstFlight;
-                    //else
-                    //{
-                        
-                    //    if (selectedFlight.SubmissionTime >= pendingFirstFlight.SubmissionTime) selectedFlight = pendingFirstFlight;
-                    //}
                 }
                 else
                 {

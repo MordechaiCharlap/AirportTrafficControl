@@ -16,10 +16,18 @@ namespace AirportTrafficControlTower.Data.Repositories
         {
             _context = context;
         }
+        private AirPortTrafficControlContext GetContext()
+        {
+            AirPortTrafficControlContext _context = new();
+            return _context;
+        }
+
         public void Create(LiveUpdate entity)
         {
+            var _context = GetContext();
             _context.Add(entity);
             _context.SaveChanges();
+
         }
 
         public bool Delete(int id)
@@ -56,13 +64,12 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public bool Update(LiveUpdate entity)
         {
-            var update = GetById(entity.LiveUpdateId);
-            if (update == null) return false;
-            else
-            {
-                _context.Update(entity);
-                return true;
-            }
+
+            var _context = GetContext();
+            _context.LiveUpdates.Update(entity);
+            _context.SaveChanges();
+            return true;
+
         }
     }
 }
