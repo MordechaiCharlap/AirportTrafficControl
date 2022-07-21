@@ -199,7 +199,6 @@ namespace AirportTrafficControlTower.Service
             if (selectedFlight != null)
             {
                 Console.WriteLine($"Sending Flight {selectedFlight.FlightId} to try moving next (must work)");
-                await _stationService.SaveChangesAsync();
                 await MoveNextIfPossible(_flightService.Get(selectedFlight.FlightId)!);
             }
         }
