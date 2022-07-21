@@ -23,9 +23,7 @@ namespace AirportTrafficControlTower.Service
         public void ChangeOccupyBy(int stationNumber, int? flightId)
         {
             Station station = new() { StationNumber = stationNumber, OccupiedBy = flightId };
-            //var station = _stationRepository.GetById(stationNumber);
-            //station!.OccupiedBy=flightId;
-            if (_stationRepository.Update(station)) Console.WriteLine($"Station {station.StationNumber} updated!");
+            _stationRepository.Update(station);
         }
 
         public bool CircleOfDoomIsFull()

@@ -51,11 +51,14 @@ namespace AirportTrafficControlTower.Service
                         if (selectedFlight == null) selectedFlight = flightToCheck;
                         else
                         {
-                            if (flightToCheck.Stations.FirstOrDefault(station => station.StationNumber == 3) != null)
+                            if (selectedFlight.Stations.FirstOrDefault(station => station.StationNumber == 3) == null)
                             {
                                 if (selectedFlight.SubmissionTime >= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
                             }
-                                
+                            else
+                            {
+                                selectedFlight = flightToCheck;
+                            }
                         }
                     }
                 }

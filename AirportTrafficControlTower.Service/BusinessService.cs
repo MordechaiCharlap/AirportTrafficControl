@@ -98,7 +98,6 @@ namespace AirportTrafficControlTower.Service
             Console.WriteLine($"Flight {flight.FlightId} is trying to move next");
             Station? nextStation = null;
             var currentStation = _stationService.GetAll().FirstOrDefault(station => station.OccupiedBy == flight.FlightId);
-            if(currentStation!=null) _stationService.Update(currentStation);
             int? currentStationNumber = currentStation?.StationNumber;
             var nextRoutes = _routeService.GetRoutesByCurrentStationAndAsc(currentStationNumber, flight.IsAscending);
             var success = false;
