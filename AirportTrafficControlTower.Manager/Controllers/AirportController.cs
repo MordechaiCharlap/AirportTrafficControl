@@ -65,16 +65,11 @@ namespace AirportTrafficControlTower.Manager.Controllers
             return list;
         }
 
-        [Route("[action]", Name = "AddNewFlightList")]
+        [Route("[action]", Name = "StartSimulator")]
         [HttpPost]
-        public async Task AddNewFlightList(int num, bool isAsc)
+        public async Task StartSimulator(SimulatorNumber simNumber)
         {
-            for (int i = 0; i < num; i++)
-            {
-                CreateFlightDto newFlight = new() { IsAscending = isAsc };
-                AddNewFlight(newFlight);
-                //_businessService.AddNewFlight(new() { IsAscending = isAsc });
-            }
+            await _businessService.StartSimulator(simNumber.Number);
         }
         [Route("[action]", Name = "AddNewFlight")]
         [HttpPost]

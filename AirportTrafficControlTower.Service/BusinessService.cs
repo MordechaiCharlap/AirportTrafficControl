@@ -49,21 +49,16 @@ namespace AirportTrafficControlTower.Service
             if (descFirstFlight != null) allTasks.Add(MoveNextIfPossible(descFirstFlight));
             await Task.WhenAll(allTasks);
         }
-        //public async Task Simulator()
-        //{
-        //    List<Task> list = new();
-        //    for (int i = 0; i < 100; i++)
-        //    {
-        //        Flight newFlight = new() { IsAscending = i % 2 == 0 };
-        //        ContextFunctionsLock(2, newFlight);
-        //        _flightsCollection.Add(newFlight);
-        //        if (newFlight == _flightsCollection.First(flight => flight.IsPending == true && flight.IsAscending == newFlight.IsAscending))
-        //        {
-        //            list.Add(MoveNextIfPossible(newFlight));
-        //        }
-        //    }
-        //    await Task.WhenAll(list);
-        //}
+        public async Task StartSimulator(int numOfFlights)
+        {
+            List<Task> list = new();
+            for (int i = 0; i < numOfFlights; i++)
+            {
+                CreateFlightDto newFlight = new() { IsAscending = i % 2 == 0 };
+                list.Add(AddNewFlight(newFlight));
+            }
+            await Task.WhenAll(list);
+        }
         public async Task AddNewFlight(CreateFlightDto flightDto)
         {
             var newFlight = _mapper.Map<Flight>(flightDto);
