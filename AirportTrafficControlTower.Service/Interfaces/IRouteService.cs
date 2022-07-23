@@ -9,7 +9,7 @@ namespace AirportTrafficControlTower.Service.Interfaces
 {
     public interface IRouteService:IService<Route>
     {
-        List<Station> GetPointingStations(Station station);
+        List<Route> GetPointingRoutes(Station station);
         bool? IsFirstAscendingStation(Station currentStation);
         List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending);
         bool IsCircleOfDoom(List<Route> nextRoutes);

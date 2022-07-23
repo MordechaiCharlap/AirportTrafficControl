@@ -34,16 +34,13 @@ namespace AirportTrafficControlTower.Service
             return _routeRepository.GetAll().ToList();
         }
 
-        public List<Station> GetPointingStations(Station station)
+        public List<Route> GetPointingRoutes(Station station)
         {
-            List<Station> pointingStations = new();
-            _routeRepository.GetAll().
-                Include(route => route.SourceStation).
+
+            return _routeRepository.GetAll().
                 Where(route => route.Destination == station.StationNumber &&
                 route.Source != null).
-                ToList().
-                ForEach(route => pointingStations.Add(route.SourceStation!));
-            return pointingStations;
+                ToList();
         }
 
         public List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)

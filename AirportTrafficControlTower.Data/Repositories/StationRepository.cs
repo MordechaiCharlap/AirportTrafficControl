@@ -49,7 +49,7 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public Station? GetById(int id)
         {
-            //var _context = GetContext();
+            var _context = GetContext();
             return _context.Stations.Find(id);
         }
 

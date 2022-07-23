@@ -52,6 +52,24 @@ namespace AirportTrafficControlTower.Service
             return _stationRepository.GetAll().ToList();
         }
 
+        public List<Station> GetOccupiedPointingStations(List<Route> pointingRoutes)
+        {
+            List<Station> validPointingStations = new();
+
+            List<Station> allStations = _stationRepository.
+                GetAll().
+                Include(station => station.OccupiedByNavigation)
+                .ToList();
+            pointingRoutes.ForEach(route =>
+            {
+                var station = allStations.Find(station => station.StationNumber == route.Source);
+                var isAsc = route.IsAscending;
+                if(station!.OccupiedBy!=null&&station.OccupiedByNavigation!.IsAscending==isAsc)
+                    validPointingStations.Add(station);
+            });
+            return validPointingStations;
+        }
+
         public async Task<Station?> GetStationByFlightId(int flightId)
         {
             return await _stationRepository.GetAll().
@@ -70,7 +88,7 @@ namespace AirportTrafficControlTower.Service
                     {
                         StationNumber = station.StationNumber,
                         FlightInStation = station.OccupiedBy,
-                        IsAscending=isAsc
+                        IsAscending = isAsc
                     });
                 });
             return list;
@@ -78,7 +96,7 @@ namespace AirportTrafficControlTower.Service
 
         public bool Update(Station entity)
         {
-                return _stationRepository.Update(entity);
+            return _stationRepository.Update(entity);
         }
     }
 }

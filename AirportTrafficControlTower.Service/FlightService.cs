@@ -14,6 +14,7 @@ namespace AirportTrafficControlTower.Service
     public class FlightService : IFlightService
     {
         private readonly IRepository<Flight> _flightRepostory;
+        private readonly object _lock = new object();
 
         public FlightService(IRepository<Flight> flightRepository)
         {
@@ -39,13 +40,15 @@ namespace AirportTrafficControlTower.Service
         }
         public Flight? GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation)
         {
-            Flight? selectedFlight = null;
-            foreach (var pointingStation in pointingStations)
-            {
-                var flightId = pointingStation.OccupiedBy;
-                if (flightId != null)
+            //All stations are already valid (occupied and by flights who are ascending/descending according to route)
+            //The stations already including the Flight property in them (OccupyByNavigation)
+                Flight? selectedFlight = null;
+                foreach (var pointingStation in pointingStations)
                 {
-                    Flight flightToCheck = _flightRepostory.GetAll().Include(flight => flight.Stations).First(flight => flight.FlightId == (int)flightId);
+                    //Flight flightToCheck = _flightRepostory.
+                    //    GetAll().
+                    //    FirstOrDefault(flight => flight.FlightId == (int)flightId && flight.TimerFinished == true);
+                    var flightToCheck = pointingStation.OccupiedByNavigation;
                     if (flightToCheck!.TimerFinished == true)
                     {
                         if (selectedFlight == null) selectedFlight = flightToCheck;
@@ -62,38 +65,48 @@ namespace AirportTrafficControlTower.Service
                         }
                     }
                 }
-            }
-            //returns if its a first station in an ascendingRoute(true), descendingRoute(false) or neither(null)
-
-            if (isFirstAscendingStation != null)
-            {
-                Console.WriteLine("Trying to find a plane in the list to start the route");
-                var pendingFirstFlight = _flightRepostory.GetAll().FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation && flight.IsPending == true);
-                if (pendingFirstFlight != null)
+                //returns if its a first station in an ascendingRoute(true), descendingRoute(false) or neither(null)
+                if (isFirstAscendingStation != null)
                 {
-                    Console.WriteLine("Found a flight in the list");
-                    if (selectedFlight == null) selectedFlight = pendingFirstFlight;
+                    Console.WriteLine("Trying to find a plane in the list to start the route");
+                    var pendingFirstFlight = _flightRepostory.GetAll().
+                        FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation &&
+                                                 flight.IsPending == true &&
+                                                 flight.TimerFinished == null);
+                    if (pendingFirstFlight != null && selectedFlight == null)
+                    {
+                        Console.WriteLine("Found a flight in the list");
+                        selectedFlight = pendingFirstFlight;
+                        //So there wont be 6+7 that taking the same flight while one is proccessing
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Have Not Found a flight in the list");
+                    }
+                }
+                if (selectedFlight == null)
+                {
+                    Console.WriteLine("No flight is waiting in pointing stations too (So no flight at all)");
+                    return null;
                 }
                 else
                 {
-                    Console.WriteLine("Have Not Found a flight in the list");
+                    Console.WriteLine($"{selectedFlight.FlightId} is the first line in queue");
+                    return selectedFlight;
                 }
-            }
-            if (selectedFlight == null)
-            {
-                Console.WriteLine("No flight is waiting");
-                return null;
-            }
-            else
-            {
-                Console.WriteLine($"{selectedFlight.FlightId} is the first line in queue");
-                return selectedFlight;
-            }
         }
 
         public bool Update(Flight entity)
         {
-            return _flightRepostory.Update(entity);
+            Flight flight = new();
+            flight.FlightId = entity.FlightId;
+            flight.SubmissionTime = entity.SubmissionTime;
+            flight.IsAscending = entity.IsAscending;
+            flight.IsDone = entity.IsDone;
+            flight.IsPending = entity.IsPending;
+            flight.TimerFinished = entity.TimerFinished;
+            return _flightRepostory.Update(flight);
         }
     }
 }

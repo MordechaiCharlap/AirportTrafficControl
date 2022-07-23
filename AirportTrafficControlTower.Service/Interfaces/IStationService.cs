@@ -10,6 +10,7 @@ namespace AirportTrafficControlTower.Service.Interfaces
 {
     public interface IStationService : IService<Station>
     {
+        List<Station> GetOccupiedPointingStations(List<Route> pointingRoutes);
         Task<Station?> GetStationByFlightId(int flightId);
         void ChangeOccupyBy(int stationNumber, int? flightId);
         List<StationStatus> GetStationsStatusList();
