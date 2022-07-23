@@ -14,7 +14,6 @@ namespace AirportTrafficControlTower.Service
     public class FlightService : IFlightService
     {
         private readonly IRepository<Flight> _flightRepostory;
-        private readonly object _lock = new object();
 
         public FlightService(IRepository<Flight> flightRepository)
         {
@@ -99,14 +98,14 @@ namespace AirportTrafficControlTower.Service
 
         public bool Update(Flight entity)
         {
-            Flight flight = new();
-            flight.FlightId = entity.FlightId;
-            flight.SubmissionTime = entity.SubmissionTime;
-            flight.IsAscending = entity.IsAscending;
-            flight.IsDone = entity.IsDone;
-            flight.IsPending = entity.IsPending;
-            flight.TimerFinished = entity.TimerFinished;
-            return _flightRepostory.Update(flight);
+            //Flight flight = new();
+            //flight.FlightId = entity.FlightId;
+            //flight.SubmissionTime = entity.SubmissionTime;
+            //flight.IsAscending = entity.IsAscending;
+            //flight.IsDone = entity.IsDone;
+            //flight.IsPending = entity.IsPending;
+            //flight.TimerFinished = entity.TimerFinished;
+            return _flightRepostory.Update(entity);
         }
     }
 }
