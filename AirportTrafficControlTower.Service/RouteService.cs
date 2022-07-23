@@ -46,18 +46,18 @@ namespace AirportTrafficControlTower.Service
         public List<Route> GetRoutesByCurrentStationAndAsc(int? currentStationNumber, bool isAscending)
         {
             var list2 = _routeRepository.GetAll().
-                Include(route => route.DestinationStation).
                 Where(route => route.Source == currentStationNumber &&
-                      route.IsAscending == isAscending &&
-                      (route.DestinationStation == null || route.DestinationStation.OccupiedBy == null)).ToList();
+                      route.IsAscending == isAscending).ToList();
             return list2;
         }
 
         public bool IsCircleOfDoom(List<Route> nextRoutes)
         {
-            if (nextRoutes.FirstOrDefault(route => (route.Destination == 6 || route.Destination == 7) && route.IsAscending == true ||
-                 (route.Destination == 4 && route.IsAscending == false)) != null) return true;
-            return false;
+            if (nextRoutes.FirstOrDefault(route =>
+            ((route.Destination == 6 || route.Destination == 7) && route.IsAscending) ||
+             (route.Destination == 4 && !route.IsAscending)) == null)
+                return false;
+            return true;
         }
 
         public bool? IsFirstAscendingStation(Station currentStation)

@@ -1,4 +1,6 @@
-﻿namespace AirportTrafficControlTower.Data.Repositories.Interfaces
+﻿using AirportTrafficControlTower.Data.Model;
+
+namespace AirportTrafficControlTower.Data.Repositories.Interfaces
 {
     public interface IRepository<T> where T : class
     {

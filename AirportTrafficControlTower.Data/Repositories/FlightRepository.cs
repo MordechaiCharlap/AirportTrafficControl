@@ -74,5 +74,10 @@ namespace AirportTrafficControlTower.Data.Repositories
                 return true;
             }
         }
+
+        public Task UpdateAsync(Station station)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

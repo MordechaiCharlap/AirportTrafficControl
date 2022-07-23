@@ -44,9 +44,6 @@ namespace AirportTrafficControlTower.Service
                 Flight? selectedFlight = null;
                 foreach (var pointingStation in pointingStations)
                 {
-                    //Flight flightToCheck = _flightRepostory.
-                    //    GetAll().
-                    //    FirstOrDefault(flight => flight.FlightId == (int)flightId && flight.TimerFinished == true);
                     var flightToCheck = pointingStation.OccupiedByNavigation;
                     if (flightToCheck!.TimerFinished == true)
                     {
@@ -98,13 +95,6 @@ namespace AirportTrafficControlTower.Service
 
         public bool Update(Flight entity)
         {
-            //Flight flight = new();
-            //flight.FlightId = entity.FlightId;
-            //flight.SubmissionTime = entity.SubmissionTime;
-            //flight.IsAscending = entity.IsAscending;
-            //flight.IsDone = entity.IsDone;
-            //flight.IsPending = entity.IsPending;
-            //flight.TimerFinished = entity.TimerFinished;
             return _flightRepostory.Update(entity);
         }
     }

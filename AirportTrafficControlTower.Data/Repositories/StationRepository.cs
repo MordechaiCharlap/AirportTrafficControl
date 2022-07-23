@@ -39,7 +39,6 @@ namespace AirportTrafficControlTower.Data.Repositories
                 return true;
             }
         }
-
         public IQueryable<Station> GetAll()
         {
             var context = GetContext();

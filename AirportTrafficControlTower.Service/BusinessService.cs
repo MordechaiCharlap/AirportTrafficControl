@@ -100,18 +100,20 @@ namespace AirportTrafficControlTower.Service
         }
         public async Task<bool> MoveNextIfPossible(Flight flight)
         {
-            Task task = null;
+            Task task1 = null;
+            Task task2 = null;
             Console.WriteLine($"Flight {flight.FlightId} is trying to move next");
             Station? nextStation = null;
             var currentStation = _stationService.GetAll().FirstOrDefault(station => station.OccupiedBy == flight.FlightId);
 
             if (currentStation == null && !flight.IsPending)
             {
-                throw new Exception("Flight that is not pending must be in a station");
+                throw new Exception($"Flight {flight.FlightId} that is not pending must be in a station");
             }
 
             int? currentStationNumber = currentStation?.StationNumber;
             var nextRoutes = _routeService.GetRoutesByCurrentStationAndAsc(currentStationNumber, flight.IsAscending);
+            Console.WriteLine($"liht {flight.FlightId} getting next routes from {currentStationNumber}");
             var success = false;
             if (!(_routeService.IsCircleOfDoom(nextRoutes) && _stationService.CircleOfDoomIsFull()))
             {
@@ -130,30 +132,45 @@ namespace AirportTrafficControlTower.Service
                         }
                         else
                         {
-                            nextStation = _stationService.GetAll().First(station => station.StationNumber == (int)route.Destination);
-                            Console.WriteLine($"Checking if station {nextStation.StationNumber} is empty");
                             lock (_lock1)
                             {
+                                nextStation = _stationService.GetAll().First(station => station.StationNumber == (int)route.Destination);
+                                Console.WriteLine($"Checking if station {nextStation.StationNumber} is empty");
+
                                 if (nextStation.OccupiedBy == null)
                                 {
                                     Console.WriteLine($"success = {nextStation.StationNumber} is empty");
 
                                     success = true;
+                                    nextStation.OccupiedBy = flight.FlightId;
                                     _stationService.ChangeOccupyBy(nextStation.StationNumber, flight.FlightId);
-                                    Console.WriteLine($"Station {nextStation.StationNumber} is now filled by {flight.FlightId}");
+                                    Console.WriteLine($"Station {nextStation.StationNumber} is now filled by {_stationService.Get(nextStation.StationNumber).OccupiedBy}");
                                 }
                                 else
-                                    Console.WriteLine($"{nextStation.StationNumber} is not empty");
+                                    Console.WriteLine($"{nextStation.StationNumber} is not empty, its occupied by {nextStation.OccupiedBy}");
                             }
 
                         }
 
                     }
                 }
+                if (!success)
+                {
+                    Console.WriteLine($"Flight {flight.FlightId} couldnt find empty station");
+                }
+                else
+                {
+                    flight.TimerFinished = false;
+                    _flightService.Update(flight);
+                }
             }
             else
             {
                 Console.WriteLine($"circle of doom************************************** flight {flight.FlightId} wont succeed");
+                foreach (var route in nextRoutes)
+                {
+                    Console.WriteLine($"route from {route.Source} to {route.Destination}");
+                }
             }
 
             if (success)
@@ -175,21 +192,26 @@ namespace AirportTrafficControlTower.Service
 
                     Console.WriteLine($"Flight {flight.FlightId} left station {currentStation!.StationNumber}");
                 }
-
+                if (currentStation != null)
+                {
+                        currentStation.OccupiedBy = null;
+                        _stationService.ChangeOccupyBy(currentStation.StationNumber, null);
+                        Console.WriteLine($"{currentStation.StationNumber} is now not occupied, curr.occupied: {_stationService.Get((int)currentStationNumber)!.OccupiedBy}");
+                    
+                    
+                }
                 if (!flight.IsDone)
                 {
                     LiveUpdate enteringUpdate = new() { FlightId = flight.FlightId, IsEntering = true, StationId = nextStation!.StationNumber, UpdateTime = DateTime.Now };
                     _liveUpdateService.Create(enteringUpdate);
                     Console.WriteLine($"Flight {flight.FlightId} enters station {nextStation!.StationNumber}, station {nextStation.StationNumber} is occupied by {nextStation.OccupiedBy}");
-                    task = StartTime(flight);
+                    task1 = StartTime(flight);
                 }
                 if (currentStation != null)
                 {
-
-                    _stationService.ChangeOccupyBy(currentStation.StationNumber, null);
-                    await SendWaitingInLineFlightIfPossible(_stationService.Get(currentStation.StationNumber)!);
+                    await SendWaitingInLineFlightIfPossible(currentStation);
                 }
-                if (task != null) await task;
+                if (task1 != null) await task1;
                 return true;
             }
             else
@@ -229,7 +251,7 @@ namespace AirportTrafficControlTower.Service
             _flightService.Update(flight);
             Console.WriteLine($"{flight.FlightId} timer started");
             var rand = new Random();
-            await Task.Delay(rand.Next(500, 1500));
+            await Task.Delay(rand.Next(1000, 1000));
             Console.WriteLine($"{flight.FlightId} timer finished");
 
             Console.WriteLine("Before Move Next function");
