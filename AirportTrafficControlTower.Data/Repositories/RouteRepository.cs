@@ -44,7 +44,7 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public void SaveChanges()
         {
-            //var _context = GetContext();
+            var _context = GetContext();
             _context.SaveChanges();
         }
 
@@ -58,9 +58,5 @@ namespace AirportTrafficControlTower.Data.Repositories
             throw new NotImplementedException();
         }
 
-        public Task UpdateAsync(Station station)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

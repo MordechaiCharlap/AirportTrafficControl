@@ -49,7 +49,7 @@ namespace AirportTrafficControlTower.Data.Repositories
         public Station? GetById(int id)
         {
             var _context = GetContext();
-            return _context.Stations.Find(id);
+            return _context.Stations.FirstOrDefault(station=>station.StationNumber==id);
         }
 
         public async Task SaveChangesAsync()
@@ -68,7 +68,7 @@ namespace AirportTrafficControlTower.Data.Repositories
         }
         public void SaveChanges()
         {
-            //var _context = GetContext();
+            var _context = GetContext();
             _context.SaveChanges();
         }
     }

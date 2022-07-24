@@ -36,7 +36,7 @@ namespace AirportTrafficControlTower.Service
 
         public List<Route> GetPointingRoutes(Station station)
         {
-
+            //not including routes from outside
             return _routeRepository.GetAll().
                 Where(route => route.Destination == station.StationNumber &&
                 route.Source != null).

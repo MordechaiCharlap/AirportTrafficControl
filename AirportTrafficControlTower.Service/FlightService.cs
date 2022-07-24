@@ -41,56 +41,51 @@ namespace AirportTrafficControlTower.Service
         {
             //All stations are already valid (occupied and by flights who are ascending/descending according to route)
             //The stations already including the Flight property in them (OccupyByNavigation)
-                Flight? selectedFlight = null;
-                foreach (var pointingStation in pointingStations)
-                {
-                    var flightToCheck = pointingStation.OccupiedByNavigation;
-                    if (flightToCheck!.TimerFinished == true)
-                    {
-                        if (selectedFlight == null) selectedFlight = flightToCheck;
-                        else
-                        {
-                            if (selectedFlight.Stations.FirstOrDefault(station => station.StationNumber == 3) == null)
-                            {
-                                if (selectedFlight.SubmissionTime >= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
-                            }
-                            else
-                            {
-                                selectedFlight = flightToCheck;
-                            }
-                        }
-                    }
-                }
-                //returns if its a first station in an ascendingRoute(true), descendingRoute(false) or neither(null)
-                if (isFirstAscendingStation != null)
-                {
-                    Console.WriteLine("Trying to find a plane in the list to start the route");
-                    var pendingFirstFlight = _flightRepostory.GetAll().
-                        FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation &&
-                                                 flight.IsPending == true &&
-                                                 flight.TimerFinished == null);
-                    if (pendingFirstFlight != null && selectedFlight == null)
-                    {
-                        Console.WriteLine("Found a flight in the list");
-                        selectedFlight = pendingFirstFlight;
-                        //So there wont be 6+7 that taking the same flight while one is proccessing
+            Flight? selectedFlight = null;
+            foreach (var pointingStation in pointingStations)
+            {
+                var flightToCheck = _flightRepostory.GetById((int)pointingStation.OccupiedBy!);
 
-                    }
+                if (flightToCheck!.TimerFinished == true)
+                {
+                    if (selectedFlight == null) selectedFlight = flightToCheck;
                     else
                     {
-                        Console.WriteLine("Have Not Found a flight in the list");
+
+                        if (selectedFlight.SubmissionTime <= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
                     }
                 }
-                if (selectedFlight == null)
+            }
+            //returns if its a first station in an ascendingRoute(true), descendingRoute(false) or neither(null)
+            if (isFirstAscendingStation != null)
+            {
+                Console.WriteLine("Trying to find a plane in the list to start the route");
+                var pendingFirstFlight = _flightRepostory.GetAll().
+                    FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation &&
+                                             flight.IsPending == true &&
+                                             flight.TimerFinished == null);
+                if (pendingFirstFlight != null && selectedFlight == null)
                 {
-                    Console.WriteLine("No flight is waiting in pointing stations too (So no flight at all)");
-                    return null;
+                    Console.WriteLine("Found a flight in the list");
+                    selectedFlight = pendingFirstFlight;
+                    //So there wont be 6+7 that taking the same flight while one is proccessing
+
                 }
                 else
                 {
-                    Console.WriteLine($"{selectedFlight.FlightId} is the first line in queue");
-                    return selectedFlight;
+                    Console.WriteLine("Have Not Found a flight in the list");
                 }
+            }
+            if (selectedFlight == null)
+            {
+                Console.WriteLine("No flight is waiting in pointing stations too (So no flight at all)");
+                return null;
+            }
+            else
+            {
+                Console.WriteLine($"{selectedFlight.FlightId} is the first line in queue");
+                return selectedFlight;
+            }
         }
 
         public bool Update(Flight entity)
