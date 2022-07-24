@@ -53,6 +53,7 @@ namespace AirportTrafficControlTower.Service
 
         public bool IsCircleOfDoom(List<Route> nextRoutes)
         {
+            //route.source =1 route.destination = 2
             if (nextRoutes.FirstOrDefault(route =>
             ((route.Destination == 6 || route.Destination == 7) && route.IsAscending) ||
              (route.Destination == 4 && !route.IsAscending)) == null)

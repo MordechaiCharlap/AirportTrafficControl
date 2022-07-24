@@ -119,7 +119,7 @@ namespace AirportTrafficControlTower.Service
             var nextRoutes = _routeService.GetRoutesByCurrentStationAndAsc(currentStationNumber, flight.IsAscending);
             Console.WriteLine($"liht {flight.FlightId} getting next routes from {currentStationNumber}");
             var success = false;
-            if (!(_routeService.IsCircleOfDoom(nextRoutes) && _stationService.CircleOfDoomIsFull()))
+            if ((_routeService.IsCircleOfDoom(nextRoutes) && _stationService.CircleOfDoomIsFull())==false)
             {
                 foreach (var route in nextRoutes)
                 {
@@ -200,13 +200,16 @@ namespace AirportTrafficControlTower.Service
                         return true;
                     }
                 }
-                else
+                
+            }
+            else
+            {
+                Console.WriteLine($"circle of doom************************************** flight {flight.FlightId} wont succeed");
+                foreach (var route in nextRoutes)
                 {
-                    Console.WriteLine($"circle of doom************************************** flight {flight.FlightId} wont succeed");
-
+                    Console.WriteLine($"route from {route.Source} to {route.Destination}");
                 }
             }
-
             return false;
         }
 
