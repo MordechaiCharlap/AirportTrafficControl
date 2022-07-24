@@ -37,7 +37,7 @@ namespace AirportTrafficControlTower.Service
         {
             return _flightRepostory.GetAll().ToList();
         }
-        public Flight? GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation)
+        public Flight? GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation, bool isFiveOccupied)
         {
             //All stations are already valid (occupied and by flights who are ascending/descending according to route)
             //The stations already including the Flight property in them (OccupyByNavigation)
@@ -53,7 +53,7 @@ namespace AirportTrafficControlTower.Service
                     if (selectedFlight == null) selectedFlight = flightToCheck;
                     else
                     {
-                        if (pointingStation.StationNumber == 8)
+                        if (pointingStation.StationNumber == 8&&isFiveOccupied)
                         {
                             selectedFlight = flightToCheck;
                         }

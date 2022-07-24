@@ -233,7 +233,8 @@ namespace AirportTrafficControlTower.Service
                 var pointingRoutes = _routeService.GetPointingRoutes(currentStation);
                 var pointingStations = _stationService.GetOccupiedPointingStations(pointingRoutes);
                 bool? isFirstAscendingStation = _routeService.IsFirstAscendingStation(currentStation);
-                selectedFlight = _flightService.GetFirstFlightInQueue(pointingStations, isFirstAscendingStation);
+                bool isFiveOccupied = _stationService.Get(5)!.OccupiedBy != null;
+                selectedFlight = _flightService.GetFirstFlightInQueue(pointingStations, isFirstAscendingStation, isFiveOccupied);
                 if (selectedFlight != null) selectedFlight.TimerFinished = false;
             }
 
@@ -261,7 +262,7 @@ namespace AirportTrafficControlTower.Service
 
             Console.WriteLine($"{flight.FlightId} timer started");
             var rand = new Random();
-            await Task.Delay(rand.Next(500, 1500));
+            await Task.Delay(rand.Next(300, 700));
             Console.WriteLine($"{flight.FlightId} timer finished");
 
             Console.WriteLine("Before Move Next function");

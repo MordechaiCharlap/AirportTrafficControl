@@ -6,6 +6,6 @@ namespace AirportTrafficControlTower.Service.Interfaces
 {
     public interface IFlightService:IService<Flight>
     {
-        Flight? GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation);
+        Flight? GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation, bool isFiveOccupied);
     }
 }
