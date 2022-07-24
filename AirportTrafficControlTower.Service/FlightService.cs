@@ -44,15 +44,20 @@ namespace AirportTrafficControlTower.Service
             Flight? selectedFlight = null;
             foreach (var pointingStation in pointingStations)
             {
-                var flightToCheck = _flightRepostory.GetById((int)pointingStation.OccupiedBy!);
+                var flightToCheck = _flightRepostory.GetAll().
+                    First(flight=>flight.FlightId==pointingStation.OccupiedBy);
 
                 if (flightToCheck!.TimerFinished == true)
                 {
+                    Console.WriteLine($"Checking flight {flightToCheck.FlightId} (timer is finished)");
                     if (selectedFlight == null) selectedFlight = flightToCheck;
                     else
                     {
-
-                        if (selectedFlight.SubmissionTime <= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
+                        if (pointingStation.StationNumber == 8)
+                        {
+                            selectedFlight = flightToCheck;
+                        }
+                        else if (selectedFlight.SubmissionTime >= flightToCheck!.SubmissionTime) selectedFlight = flightToCheck;
                     }
                 }
             }

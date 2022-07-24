@@ -33,7 +33,7 @@ namespace AirportTrafficControlTower.Service
             {
                 if (station.StationNumber >= 4 && station.StationNumber <= 8 && station.OccupiedBy != null) count++;
             });
-            if (count == 4) return true;
+            if (count >= 4) return true;
             return false;
         }
 
