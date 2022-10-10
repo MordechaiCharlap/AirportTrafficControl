@@ -15,7 +15,6 @@ namespace AirportTrafficControlTower.Service.Interfaces
         Task StartSimulator(int numOfFlights);
         List<Station> GetAllStationsStatus();
         List<StationStatus> GetStationsStatusList();
-        List<GetFlightDto> GetAllFlights();
         List<GetFlightDto> GetPendingFlightsByAsc(bool isAsc);
         List<LiveUpdate> GetAllLiveUpdates();
     }

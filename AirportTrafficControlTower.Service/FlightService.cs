@@ -30,14 +30,15 @@ namespace AirportTrafficControlTower.Service
 
         public Flight? Get(int id)
         {
-            return _flightRepostory.GetById(id);
+            return _flightRepostory.Get(id);
         }
 
         public List<Flight> GetAll()
         {
             return _flightRepostory.GetAll().ToList();
         }
-        public Flight? GetFirstFlightInQueue(List<Station> pointingStations, bool? isFirstAscendingStation, bool isFiveOccupied)
+        public Flight? GetFirstFlightInQueue
+            (List<Station> pointingStations, bool isFirstAscendingStation, bool isFirstDescendingStation, bool isFiveOccupied)
         {
             //All stations are already valid (occupied and by flights who are ascending/descending according to route)
             //The stations already including the Flight property in them (OccupyByNavigation)
@@ -62,16 +63,35 @@ namespace AirportTrafficControlTower.Service
                 }
             }
             //returns if its a first station in an ascendingRoute(true), descendingRoute(false) or neither(null)
-            if (isFirstAscendingStation != null)
+            if (isFirstAscendingStation != false)
             {
                 Console.WriteLine("Trying to find a plane in the list to start the route");
                 var pendingFirstFlight = _flightRepostory.GetAll().
-                    FirstOrDefault(flight => flight.IsAscending == isFirstAscendingStation &&
+                    FirstOrDefault(flight => flight.IsAscending == true &&
                                              flight.IsPending == true &&
                                              flight.TimerFinished == null);
                 if (pendingFirstFlight != null && selectedFlight == null)
                 {
-                    Console.WriteLine("Found a flight in the list");
+                    Console.WriteLine("Found a flight in the ascending list");
+                    selectedFlight = pendingFirstFlight;
+                    //So there wont be 6+7 that taking the same flight while one is proccessing
+
+                }
+                else
+                {
+                    Console.WriteLine("Have Not Found a flight in the ascending list");
+                }
+            }
+            if (isFirstDescendingStation != false)
+            {
+                Console.WriteLine("Trying to find a plane in the list to start the route");
+                var pendingFirstFlight = _flightRepostory.GetAll().
+                    FirstOrDefault(flight => flight.IsAscending == false &&
+                                             flight.IsPending == true &&
+                                             flight.TimerFinished == null);
+                if (pendingFirstFlight != null && selectedFlight == null)
+                {
+                    Console.WriteLine("Found a flight in the descending list");
                     selectedFlight = pendingFirstFlight;
                     //So there wont be 6+7 that taking the same flight while one is proccessing
 

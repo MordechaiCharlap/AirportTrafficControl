@@ -5,15 +5,13 @@ using AirportTrafficControlTower.Data.Repositories.Interfaces;
 using AirportTrafficControlTower.Service;
 using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.EntityFrameworkCore;
-using Hangfire;
-using Hangfire.SqlServer;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddDbContext<AirPortTrafficControlContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AirPortDataConnectionString"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AirPortConnectionString"));
 }, ServiceLifetime.Transient);
 
 builder.Services.AddControllers();
@@ -41,20 +39,6 @@ builder.Services.AddTransient<IRepository<Flight>, FlightRepository>();
 builder.Services.AddTransient<IRepository<AirportTrafficControlTower.Data.Model.Route>, RouteRepository>();
 builder.Services.AddRouting();
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-var connectionString = builder.Configuration.GetConnectionString("AirPortDataConnectionString");
-builder.Services.AddHangfire(configuration => configuration
-        .SetDataCompatibilityLevel(CompatibilityLevel.Version_170)
-        .UseSimpleAssemblyNameTypeSerializer()
-        .UseRecommendedSerializerSettings()
-        .UseSqlServerStorage(connectionString, new SqlServerStorageOptions
-        {
-            CommandBatchMaxTimeout = TimeSpan.FromMinutes(5),
-            SlidingInvisibilityTimeout = TimeSpan.FromMinutes(5),
-            QueuePollInterval = TimeSpan.Zero,
-            UseRecommendedIsolationLevel = true,
-            DisableGlobalLocks = true
-        }));
-builder.Services.AddHangfireServer();
 
 var app = builder.Build();
 // Configure the HTTP request pipeline.
@@ -66,7 +50,6 @@ if (app.Environment.IsDevelopment())
 app.UseRouting();
 app.UseCors("myPolicy");
 app.UseAuthentication();
-app.UseHangfireDashboard();
 app.UseHttpsRedirection();
 app.UseAuthorization();
 app.UseEndpoints(endpoints =>

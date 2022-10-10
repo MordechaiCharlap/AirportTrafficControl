@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirportTrafficControlTower.
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirportTrafficControlTower.Manager", "AirportTrafficControlTower.Manager\AirportTrafficControlTower.Manager.csproj", "{5A5111B1-AF6A-44D9-B0A9-4CCFFF3FE448}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirportTrafficControlTower.Client", "AirportTrafficControlTower.Client\AirportTrafficControlTower.Client.csproj", "{1E1DFB25-86CC-49F6-9A7F-A3D9286FDF96}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "AirportTrafficControlTower.Client", "AirportTrafficControlTower.Client\AirportTrafficControlTower.Client.csproj", "{1E1DFB25-86CC-49F6-9A7F-A3D9286FDF96}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AirportTrafficControlTower.UnitTests", "AirportTrafficControlTower.UnitTests\AirportTrafficControlTower.UnitTests.csproj", "{002958D7-3431-4033-BB77-AEE57E1DBC48}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{1E1DFB25-86CC-49F6-9A7F-A3D9286FDF96}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1E1DFB25-86CC-49F6-9A7F-A3D9286FDF96}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1E1DFB25-86CC-49F6-9A7F-A3D9286FDF96}.Release|Any CPU.Build.0 = Release|Any CPU
+		{002958D7-3431-4033-BB77-AEE57E1DBC48}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{002958D7-3431-4033-BB77-AEE57E1DBC48}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{002958D7-3431-4033-BB77-AEE57E1DBC48}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{002958D7-3431-4033-BB77-AEE57E1DBC48}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

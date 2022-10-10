@@ -25,7 +25,7 @@ namespace AirportTrafficControlTower.Service
 
         public LiveUpdate? Get(int id)
         {
-            return _liveUpdateRepository.GetById(id);
+            return _liveUpdateRepository.Get(id);
         }
 
         public List<LiveUpdate> GetAll()

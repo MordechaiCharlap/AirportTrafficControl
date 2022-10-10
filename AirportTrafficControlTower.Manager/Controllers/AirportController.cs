@@ -2,8 +2,6 @@
 using AirportTrafficControlTower.Data.Model;
 using AirportTrafficControlTower.Service.Interfaces;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Hangfire;
 using Microsoft.AspNetCore.Cors;
 
 namespace AirportTrafficControlTower.Manager.Controllers
@@ -23,7 +21,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
         [HttpPost]
         public async Task StartApp()
         {
-            await  _businessService.StartApp();
+            await _businessService.StartApp();
         }
         [Route("[action]/{isAsc:bool}", Name = "GetPendingFlightsByAsc")]
         [HttpGet]
@@ -32,16 +30,6 @@ namespace AirportTrafficControlTower.Manager.Controllers
             var list = _businessService.GetPendingFlightsByAsc(isAsc);
             return list;
         }
-
-        [Route("[action]", Name = "GetAllFlights")]
-        [HttpGet]
-        public  List<GetFlightDto> GetAllFlights()
-        {
-            //###################################################
-            //return null;
-            return _businessService.GetAllFlights();
-        }
-
         [Route("[action]", Name = "GetAllStationsStatus")]
         [HttpGet]
         public List<Station> GetAllStationsStatus()
@@ -61,7 +49,7 @@ namespace AirportTrafficControlTower.Manager.Controllers
         [HttpGet]
         public List<LiveUpdate> GetAllLiveUpdates()
         {
-            var list =  _businessService.GetAllLiveUpdates();
+            var list = _businessService.GetAllLiveUpdates();
             return list;
         }
 
@@ -76,7 +64,6 @@ namespace AirportTrafficControlTower.Manager.Controllers
         public async Task AddNewFlight(CreateFlightDto flight)
         {
             await _businessService.AddNewFlight(flight);
-            //var addFlight = BackgroundJob.Enqueue(() => _businessService.AddNewFlight(flight));
         }
     }
 }

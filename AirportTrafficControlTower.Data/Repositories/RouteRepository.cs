@@ -37,7 +37,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             return _context.Routes;
         }
 
-        public Route? GetById(int id)
+        public Route? Get(int id)
         {
             throw new NotImplementedException();
         }
@@ -48,10 +48,6 @@ namespace AirportTrafficControlTower.Data.Repositories
             _context.SaveChanges();
         }
 
-        public Task SaveChangesAsync()
-        {
-            throw new NotImplementedException();
-        }
 
         public bool Update(Route entity)
         {

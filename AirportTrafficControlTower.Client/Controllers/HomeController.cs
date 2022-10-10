@@ -2,11 +2,8 @@
 using AirportTrafficControlTower.Client.Models;
 using AirportTrafficControlTower.Data.Model;
 using AirportTrafficControlTower.Service.Dtos;
-using Hangfire;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
-using System.Diagnostics;
-using System.Net.Http.Headers;
 using System.Text;
 namespace AirportTrafficControlTower.Client.Controllers
 {
@@ -22,9 +19,16 @@ namespace AirportTrafficControlTower.Client.Controllers
         {
             return View();
         }
-        public IActionResult Privacy()
+        public async Task<IActionResult> StartApp()
         {
-            return View();
+            using (var client = _api.Initial())
+            {
+                string uri = "api/Airport/StartApp";
+                var json = JsonConvert.SerializeObject("");
+                var payload = new StringContent(json, Encoding.UTF8, "application/json");
+                var res = client.PostAsync(uri, payload).Result.Content.ReadAsStringAsync().Result;
+                return RedirectToAction("Index");
+            }
         }
         public IActionResult AddNewFlight(bool isAsc)
         {
@@ -53,7 +57,6 @@ namespace AirportTrafficControlTower.Client.Controllers
                 var response = await client.PostAsync(uri, payload);
                 await response.Content.ReadAsStringAsync();
 
-                //var res = client.PostAsync(uri, payload).Result.Content.ReadAsStringAsync().Result;
                 return RedirectToAction("GetAllStationsStatus");
             }
         }

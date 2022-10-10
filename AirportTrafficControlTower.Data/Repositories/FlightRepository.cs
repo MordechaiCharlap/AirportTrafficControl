@@ -15,7 +15,7 @@ namespace AirportTrafficControlTower.Data.Repositories
         {
             _context = context;
         }
-        private AirPortTrafficControlContext GetContext()
+        public AirPortTrafficControlContext GetContext()
         {
             AirPortTrafficControlContext _context = new();
             return _context;
@@ -28,7 +28,7 @@ namespace AirportTrafficControlTower.Data.Repositories
         }
         public bool Delete(int id)
         {
-            var flight = GetById(id);
+            var flight = Get(id);
             if (flight == null) return false;
             else
             {
@@ -44,7 +44,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             return _context.Flights;
         }
 
-        public Flight? GetById(int id)
+        public Flight? Get(int id)
         {
             var _context = GetContext();
             return _context.Flights.Find(id);
@@ -55,17 +55,10 @@ namespace AirportTrafficControlTower.Data.Repositories
             var _context = GetContext();
             _context.SaveChanges();
         }
-
-        public async Task SaveChangesAsync()
-        {
-            var _context = GetContext();
-            await _context.SaveChangesAsync();
-        }
-
         public bool Update(Flight entity)
         {
             var _context = GetContext();
-            var flight = GetById(entity.FlightId);
+            var flight = Get(entity.FlightId);
             if (flight == null) return false;
             else
             {
@@ -73,11 +66,6 @@ namespace AirportTrafficControlTower.Data.Repositories
                 _context.SaveChanges();
                 return true;
             }
-        }
-
-        public Task UpdateAsync(Station station)
-        {
-            throw new NotImplementedException();
         }
     }
 }

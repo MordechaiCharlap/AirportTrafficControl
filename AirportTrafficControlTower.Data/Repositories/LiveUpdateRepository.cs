@@ -32,7 +32,7 @@ namespace AirportTrafficControlTower.Data.Repositories
 
         public bool Delete(int id)
         {
-            var update = GetById(id);
+            var update = Get(id);
             if (update == null) return false;
             else
             {
@@ -47,7 +47,7 @@ namespace AirportTrafficControlTower.Data.Repositories
             return _context.LiveUpdates;
         }
 
-        public LiveUpdate? GetById(int id)
+        public LiveUpdate? Get(int id)
         {
             return _context.LiveUpdates.Find(id);
         }
@@ -55,11 +55,6 @@ namespace AirportTrafficControlTower.Data.Repositories
         public void SaveChanges()
         {
             _context.SaveChanges();
-        }
-
-        public async Task SaveChangesAsync()
-        {
-            await _context.SaveChangesAsync();
         }
 
         public bool Update(LiveUpdate entity)

@@ -7,19 +7,17 @@
     <thead>
         <tr>
             <th>
-                @Html.DisplayNameFor(model => model.LiveUpdatesList.First().LiveUpdateId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LiveUpdatesList.First().FlightId)
-            </th>
-            <th>
-                @Html.DisplayNameFor(model => model.LiveUpdatesList.First().StationId)
-            </th>
-            <th>
                 @Html.DisplayNameFor(model => model.LiveUpdatesList.First().UpdateTime)
             </th>
             <th>
-                @Html.DisplayNameFor(model => model.LiveUpdatesList.First().IsEntering)
+                Flight
+            </th>
+
+            <th>
+                Entered/Left
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.LiveUpdatesList.First().StationId)
             </th>
             <th></th>
         </tr>
@@ -29,19 +27,21 @@
         {
             <tr>
                 <td>
-                    @Html.DisplayFor(modelItem => item.LiveUpdateId)
+                    @Html.DisplayFor(modelItem => item.UpdateTime)
                 </td>
                 <td>
                     @Html.DisplayFor(modelItem => item.FlightId)
                 </td>
+                @if (item.IsEntering)
+                {
+                    <td>Entered</td>
+                }
+                else
+                {
+                    <td>Left</td>
+                }
                 <td>
                     @Html.DisplayFor(modelItem => item.StationId)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.UpdateTime)
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.IsEntering)
                 </td>
             </tr>
         }

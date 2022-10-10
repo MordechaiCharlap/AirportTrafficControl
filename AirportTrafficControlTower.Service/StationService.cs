@@ -19,13 +19,6 @@ namespace AirportTrafficControlTower.Service
         {
             _stationRepository = stationRepository;
         }
-
-        public void ChangeOccupyBy(int stationNumber, int? flightId)
-        {
-            Station station = new() { StationNumber = stationNumber, OccupiedBy = flightId };
-            _stationRepository.Update(station);
-        }
-
         public bool CircleOfDoomIsFull()
         {
             int count = 0;
@@ -44,7 +37,7 @@ namespace AirportTrafficControlTower.Service
 
         public Station? Get(int id)
         {
-            return _stationRepository.GetById(id);
+            return _stationRepository.Get(id);
         }
 
         public List<Station> GetAll()
@@ -58,13 +51,13 @@ namespace AirportTrafficControlTower.Service
 
             List<Station> allStations = _stationRepository.
                 GetAll().
-                Include(station => station.OccupiedByNavigation)
-                .ToList();
+                Include(station => station.OccupiedByNavigation).
+                ToList();
             pointingRoutes.ForEach(route =>
             {
                 var station = allStations.Find(station => station.StationNumber == route.Source);
                 var isAsc = route.IsAscending;
-                if(station!.OccupiedBy!=null&&station.OccupiedByNavigation!.IsAscending==isAsc)
+                if (station!.OccupiedBy != null && station.OccupiedByNavigation!.IsAscending == isAsc)
                     validPointingStations.Add(station);
             });
             return validPointingStations;

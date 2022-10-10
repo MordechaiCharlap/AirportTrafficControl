@@ -1,17 +1,27 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
 }
-
+<script type="text/javascript">
+    $(document).ready(function(){
+        $.ajax({
+                url: '@Url.Action("StartApp")',
+                type: 'POST',
+                dataType: 'json',
+                success: function (data, textStatus, xhr) {
+                    console.log("successNum");
+                },
+                error: function (xhr, textStatus, errorThrown) {
+                    console.log('Error in OperationNum');
+                }
+            });
+    });
+</script>
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
-    
      <div class="flex-row">
-        <button>Live Updates History</button>
-        <a class="btn btn-sm btn-outline-secondary" asp-action="GetPendingFlightsByAsc" asp-route-isAsc="true">Pending Take-offs</a>
-        <a class="btn btn-sm btn-outline-secondary" asp-action="GetPendingFlightsByAsc" asp-route-isAsc="false">Pending Descending-flights</a>
-        <a class="btn btn-sm btn-outline-secondary" asp-action="GetAllStationsStatus">Stations status</a>
-        <a class="btn btn-sm btn-outline-secondary" asp-action="SeeAllLiveUpdates">Live Updates</a>
+        <a class="btn btn-sm btn-outline-secondary index-btn" asp-action="GetPendingFlightsByAsc" asp-route-isAsc="true">Pending Take-offs</a>
+        <a class="btn btn-sm btn-outline-secondary index-btn" asp-action="GetPendingFlightsByAsc" asp-route-isAsc="false">Pending Descending-flights</a>
+        <a class="btn btn-sm btn-outline-secondary index-btn" asp-action="GetAllStationsStatus">Stations status</a>
+        <a class="btn btn-sm btn-outline-secondary index-btn" asp-action="SeeAllLiveUpdates">Live Updates</a>
     </div>
 
 </div>

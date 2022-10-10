@@ -12,7 +12,6 @@ namespace AirportTrafficControlTower.Service.Interfaces
     {
         List<Station> GetOccupiedPointingStations(List<Route> pointingRoutes);
         Task<Station?> GetStationByFlightId(int flightId);
-        void ChangeOccupyBy(int stationNumber, int? flightId);
         List<StationStatus> GetStationsStatusList();
         bool CircleOfDoomIsFull();
     }
