@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<AirPortTrafficControlContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AirPortConnectionString"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AirportDataConnectionString"));
 }, ServiceLifetime.Transient);
 
 builder.Services.AddControllers();
