@@ -11,7 +11,7 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddDbContext<AirPortTrafficControlContext>(options =>
 {
-    options.UseSqlServer(builder.Configuration.GetConnectionString("AirportDataConnectionString"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("AirPortDataConnectionString"));
 }, ServiceLifetime.Transient);
 
 builder.Services.AddControllers();
@@ -19,7 +19,7 @@ builder.Services.AddCors(options => {
     options.AddPolicy("myPolicy",
                       policy => {
                           policy
-                            .WithOrigins("https://localhost:7237")
+                            .WithOrigins("https://localhost:5174")
                             //.AllowAnyOrigin()
                             .AllowAnyMethod()
                             .AllowAnyHeader();
